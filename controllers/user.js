@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 // creating a signature to sign the payload data for identification
 const signature = "iwillcompletethisprojectasap";
 
+// to create user
 const createUser = async (req, res) => {
 
     // validating errors for authentication (creating user)
@@ -35,7 +36,7 @@ const createUser = async (req, res) => {
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: req.body.gender,
-        refCode: req.body.refCode,
+        refCode: req.body.refCode ? req.body.refCode : null,
         isVerified: false,
     })
         .then((user) => {  // sending response, when user is created
@@ -57,4 +58,4 @@ const createUser = async (req, res) => {
         }));
 };
 
-module.exports = {createUser};
+module.exports = { createUser };

@@ -82,7 +82,7 @@ const descriptions = {
         "max-length": 20,
         "type": "any",
         "unique": false,
-    }
+    },
 };
 
 module.exports = {descriptions, validateUserField};
