@@ -6,18 +6,19 @@ const cors = require("cors");
 // mongo connection
 connectToMongo();
 
-const app = express();
-const port = 3200;
+const app = express()
+const PORT = 3200;
 
-// const apiPath = '/api/v1/';
+const APIPATH = '/api/v1/';
 
 // to use req.body, we have to use this middleware
 app.use(express.json());
 app.use(cors());
 
 // all availble routing for the api
+app.use(APIPATH + 'auth', require('./routes/auth/auth.js'));
 
 // running the app
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Example app listening on port http://localhost:${PORT}`);
 });

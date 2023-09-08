@@ -36,8 +36,12 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    refralCode: {
+    refCode: {
         type: String,
+    },
+    isVerified: {
+        type: Boolean,
+        required: true,
     },
     timestamp: {
         type: Date,
