@@ -1,0 +1,16 @@
+{
+  "name": "bzml-backend",
+  "version": "1.0.0",
+  "description": "This project is used to create API's to communicate with database and frontend using express and mongodb.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hritik kumar sinha",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "nodemon": "^3.0.1"
+  }
+}
