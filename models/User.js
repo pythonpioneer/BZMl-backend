@@ -43,6 +43,10 @@ const userSchema = new Schema({
         type: Boolean,
         required: true,
     },
+    country: {
+        type: String,
+        default: "India"
+    },
     timestamp: {
         type: Date,
         default: Date.now,
