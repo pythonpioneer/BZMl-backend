@@ -4,7 +4,7 @@
   "description": "This project is used to create API's to communicate with database and frontend using express and mongodb.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon src/index.js"
   },
   "author": "Hritik kumar sinha",
   "license": "ISC",
