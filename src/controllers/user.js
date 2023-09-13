@@ -1,13 +1,10 @@
 // importing all requirements
-const { descriptions } = require('./validator');
+const { descriptions } = require('../helper/form/fieldDesc');
 const { validationResult } = require('express-validator');
 const User = require('../models/user/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { generateToken } = require('../middleware/auth/authMiddleware');
+const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
 
-
-// creating a signature to sign the payload data for identification
-const signature = "iwillcompletethisprojectasap";
 
 // to create user
 const createUser = async (req, res) => {
@@ -23,9 +20,8 @@ const createUser = async (req, res) => {
         desc: descriptions[result["errors"][0]["path"]],
     });
 
-    // now generate a hash password from password using hashing
-    const salt = bcrypt.genSaltSync(10);  // salt of 10 characters
-    const securePassword = bcrypt.hashSync(req.body.password, salt);
+    // generate password using bcrypt
+    const securePassword = generatePassword(req.body.password);
 
     // create the user in db
     User.create({
@@ -49,7 +45,7 @@ const createUser = async (req, res) => {
             };
 
             // generating authToken when user created
-            const authToken = jwt.sign(payloadData, signature);
+            const authToken = generateToken(payloadData);
             res.status(200).json({"status": 200, "message": "user created", "auth-token": authToken});
         })
 
@@ -83,7 +79,7 @@ const loginUser = async (req, res) => {
         if(!user) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
         
         // now, compare the password using bcrypt.js
-        const isPasswordMatches = bcrypt.compareSync(password, user.password);
+        const isPasswordMatches = comparePassword(password, user.password);
         if (!isPasswordMatches) return res.status(400).json({ status: 400, message: "Invalid Credentials" });  // password not matched
 
         // if password matched, sending user id as payload, accesssing data using id is easier
@@ -94,8 +90,8 @@ const loginUser = async (req, res) => {
         };
 
         // generate auth-token send it
-        const authToken = jwt.sign(payloadData, signature);
-        res.status(200).json({ status: 200, "message": "user created", "auth-token": authToken});
+        const authToken = generateToken(payloadData)
+        res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken});
 
     } catch(err){
         res.status(500).json({  // any unrecogonize error will be raised from here

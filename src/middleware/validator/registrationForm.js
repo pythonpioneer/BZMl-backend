@@ -1,10 +1,8 @@
-const { check, body, validationResult } = require('express-validator');
-const { validate } = require('../models/user/User');
-const User = require('../models/user/User');
-
+const { body, validationResult } = require('express-validator');
+const User = require('../../models/user/User');
 
 // validating user input field
-const validateUserField = [
+exports.validateRegistrationField = [
 
     // validating all input data to create user
     body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({min: 9, max: 12}).custom(async (pubgID) => {
@@ -32,57 +30,3 @@ const validateUserField = [
     body('refCode', 'Enter refral code (not required)').isLength({max: 20}),
 
 ];
-
-// a description for all the possible input fields
-const descriptions = {
-    pubgID: {
-        "min-length": 9,
-        "max-length": 12,
-        "type": "numeric",  // input character type
-        "unique": true,
-    },
-    pubgName: {
-        "min-length": 1,
-        "max-length": 30,
-        "type": "any",
-        "unique": true,
-    },
-    fullName: {
-        "min-length": 3,
-        "max-length": 25,
-        "type": "any",
-        "unique": false,
-    }, 
-    email: {
-        "min-length": 3,
-        "max-length": 25,
-        "type": "email",
-        "unique": true,
-    },
-    mobileNumber: {
-        "min-length": 10,
-        "max-length": 10,
-        "type": "numeric",
-        "unique": true,
-    },
-    password: {
-        "min-length": 6,
-        "max-length": 18,
-        "type": "alpha-numeric",
-        "unique": false,
-    },
-    gender: {
-        "min-length": 1,
-        "max-length": 1,
-        "type": "alpha",
-        "unique": false,
-    },
-    refCode: {
-        "min-length": 0,
-        "max-length": 20,
-        "type": "any",
-        "unique": false,
-    },
-};
-
-module.exports = {descriptions, validateUserField};

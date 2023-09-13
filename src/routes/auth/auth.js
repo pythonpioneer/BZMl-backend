@@ -2,12 +2,12 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const { validateUserField } = require('../../controllers/validator');
 const { createUser, loginUser } = require('../../controllers/user');
+const { validateRegistrationField }  = require('../../middleware/validator/registrationForm');
 
 
 // Route 1: To create user: '/api/v1/auth/user' [using POST] (login not required)
-router.post('/user', validateUserField, createUser);
+router.post('/user', validateRegistrationField, createUser);
 
 // Route 2: To login user: '/api/v1/auth/loginuser' [using POST] (login not required)
 router.post('/loginuser', [
