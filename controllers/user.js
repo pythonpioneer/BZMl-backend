@@ -1,7 +1,7 @@
 // importing all requirements
 const { descriptions } = require('./validator');
 const { validationResult } = require('express-validator');
-const User = require('../models/User');
+const User = require('../models/user/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

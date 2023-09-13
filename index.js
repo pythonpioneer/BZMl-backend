@@ -1,5 +1,5 @@
 // importing requirements
-const connectToMongo = require('./db');
+const connectToMongo = require('./connectionDB/db');
 const express = require('express');
 const cors = require("cors");
 
@@ -20,5 +20,5 @@ app.use(APIPATH + 'auth', require('./routes/auth/auth.js'));
 
 // running the app
 app.listen(PORT, () => {
-  console.log(`Example app listening on port http://localhost:${PORT}`);
+  console.log(`BZML app listening on port http://localhost:${PORT}`);
 });
