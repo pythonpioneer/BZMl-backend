@@ -1,24 +1,13 @@
 // importing all requirements
-const { descriptions } = require('../helper/form/fieldDesc');
-const { validationResult } = require('express-validator');
 const User = require('../models/user/User');
+const { validationResult } = require('express-validator');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
+const { isNumber } = require('../helper/utility/fieldIdentifier');
 
 
 // to create user
 const createUser = async (req, res) => {
-
-    // validating errors for authentication (creating user)
-    const result = validationResult(req);
-
-    // user will not create
-    if (!result.isEmpty()) return res.status(400).json({
-        status: 400,
-        message: result["errors"][0]["msg"],
-        where: result["errors"][0]["path"],
-        desc: descriptions[result["errors"][0]["path"]],
-    });
 
     // generate password using bcrypt
     const securePassword = generatePassword(req.body.password);
@@ -50,16 +39,13 @@ const createUser = async (req, res) => {
         })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
-            errors: "Internal server error", issue: err
+            errors: "Internal server error", 
+            issue: err
         }));
 };
 
 // to login an existing user
 const loginUser = async (req, res) => {
-
-    // validating errors for authentication (creating user)
-    const result = validationResult(req);
-    if (!result.isEmpty()) return res.status(400).json({ status: 400, message: result["errors"][0]["msg"], where: result["errors"][0]["path"] });
 
     try {  // now confirm authentication
         
@@ -68,11 +54,8 @@ const loginUser = async (req, res) => {
 
         /* find the user with given email/id/no. and validate, if user exists 
         now, find the type of user field */
-        if(/^[0-9]*$/.test(userfield)){  // means userfield belongs to mobileNumber or pubgID
-
+        if(isNumber (userfield))
             user = await User.findOne({mobileNumber: userfield});  // login with mobile no.
-            if(!user) user = await User.findOne({pubgID: userfield});  // login with pubg-id
-        }
         else user = await User.findOne({ email: userfield });  // login with email
         
         // if user doesn't exist or wrong input fields

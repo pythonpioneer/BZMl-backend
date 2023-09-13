@@ -1,7 +1,8 @@
 const { body, validationResult } = require('express-validator');
 const User = require('../../models/user/User');
 
-// validating user input field
+
+// A validation array to validate user input field for registration
 exports.validateRegistrationField = [
 
     // validating all input data to create user
@@ -29,4 +30,10 @@ exports.validateRegistrationField = [
     body('gender', 'Enter gender initials').isAlpha().isLength({min: 1, max: 1}),
     body('refCode', 'Enter refral code (not required)').isLength({max: 20}),
 
+];
+
+// A validation array to validate user input field for login
+exports.validateLoginField = [
+    body('userfield', 'enter valid mobileNumber/email to login').isLength({min: 9, max: 50}),
+    body('password', "Enter valid password").isAlphanumeric().isLength({min: 6, max: 18})
 ];
