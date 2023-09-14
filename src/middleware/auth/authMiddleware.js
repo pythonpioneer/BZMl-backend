@@ -9,6 +9,25 @@ exports.generateToken = (payloadData) => {
     return authToken;
 };
 
+exports.validateToken = (req, res, next) => {
+
+    // fetch the user id from the token(jwt) from
+    const token = req.body('auth-token');
+
+    // if token is not present then send bad request
+    if(!token) res.status(401).json({ errors: "please authenticate with a valid token" });
+
+    // now fetch the id from the jwt token
+    try {
+        const data = jwt.verify(token, SIGNATURE);
+    }
+    catch(err){
+
+    }
+
+
+}
+
 
 
             
