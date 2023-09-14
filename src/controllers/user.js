@@ -85,7 +85,7 @@ const loginUser = async (req, res) => {
 };
 
 // to get the user details using user id
-const getUser = async (req, res) => {
+const getUserDetails = async (req, res) => {
 
     try {  // find user by id
         const user = await User.findById(req.user.id)
@@ -96,4 +96,9 @@ const getUser = async (req, res) => {
     }
 }
 
-module.exports = { createUser, loginUser, getUser };
+// to set user details or updata
+const setUserDetails = async (req, res) => {
+
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails };

@@ -16,7 +16,7 @@ exports.fetchUser = (req, res, next) => {
     const token = req.header('auth-token');
 
     // if token is not present then send bad request
-    if (!token) res.status(401).json({ errors: "please authenticate with a valid token", issue: err });
+    if (!token) res.status(401).json({ errors: "please authenticate with a valid token" });
 
     // now fetch the id from the jwt token
     try {
