@@ -1,6 +1,5 @@
 // importing all requirements
 const User = require('../models/user/User');
-const { validationResult } = require('express-validator');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
@@ -11,6 +10,8 @@ const createUser = async (req, res) => {
 
     // generate password using bcrypt
     const securePassword = generatePassword(req.body.password);
+    let gender = req.body.gender;
+    gender = gender.toUpperCase();
 
     // create the user in db
     User.create({
@@ -20,7 +21,7 @@ const createUser = async (req, res) => {
         email: req.body.email,
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
-        gender: req.body.gender,
+        gender: gender,
         refCode: req.body.refCode ? req.body.refCode : null,
         isVerified: false,
     })
@@ -85,7 +86,7 @@ const loginUser = async (req, res) => {
 };
 
 // to get the user details using user id
-const getUser = async (req, res) => {
+const getUserDetails = async (req, res) => {
 
     try {  // find user by id
         const user = await User.findById(req.user.id)
@@ -96,4 +97,58 @@ const getUser = async (req, res) => {
     }
 }
 
-module.exports = { createUser, loginUser, getUser };
+// to set user details or update
+const setUserDetails = async (req, res) => {
+
+    try {
+        // fetch all variables from bod
+        const { pubgName, fullName, email, mobileNumber, gender } = req.body;
+        let toBeUpdated = false;
+
+        // create a new user object, updating timestamp field
+        const updatedUser = { timestamp: Date.now() };
+
+        // now, fill all the updated details in the new user object
+        if (pubgName) {
+            toBeUpdated = true;
+            updatedUser.isVerified = false;
+            updatedUser.pubgName = pubgName;
+        }
+        if (fullName) {
+            toBeUpdated = true;
+            updatedUser.fullName = fullName;
+        }
+        if (email) {
+            toBeUpdated = true;
+            updatedUser.isVerified = false;
+            updatedUser.email = email;
+        }
+        if (mobileNumber) {
+            toBeUpdated = true;
+            updatedUser.isVerified = false;
+            updatedUser.mobileNumber = mobileNumber;
+        }
+        if (gender) {
+            toBeUpdated = true;
+            updatedUser.gender = gender;
+        }
+
+        if(toBeUpdated){
+            // now find the user that to be updated and confirm that the user exists
+            let user = await User.findById(req.user.id);
+            if (!user) res.status(404).json({ status: 404, message: "User Not Found" });
+
+            // now update the user and send the response
+            user = await User.findByIdAndUpdate(req.user.id, { $set: updatedUser }, { new: true });
+            res.status(200).json({ status: 200, message: 'user updated', user: user });
+        }
+        // this will not send any json as response because status: 204
+        else res.status(204).json({status: 204, message: "Nothing is there to be updated"});
+
+    } catch (err) { 
+        res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails };
