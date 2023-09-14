@@ -9,25 +9,24 @@ exports.generateToken = (payloadData) => {
     return authToken;
 };
 
-exports.validateToken = (req, res, next) => {
+// a middlware to validate token and fethc user id from the token
+exports.fetchUser = (req, res, next) => {
 
-    // fetch the user id from the token(jwt) from
-    const token = req.body('auth-token');
+    // fetch the token from the request header and fetch user id from the token(jwt) 
+    const token = req.header('auth-token');
 
     // if token is not present then send bad request
-    if(!token) res.status(401).json({ errors: "please authenticate with a valid token" });
+    if (!token) res.status(401).json({ errors: "please authenticate with a valid token", issue: err });
 
     // now fetch the id from the jwt token
     try {
-        const data = jwt.verify(token, SIGNATURE);
+        const data = jwt.verify(token, SIGNATURE);  // throw an error when token didn't verify, handled by catch
+        req.user = data.user;
+        next();
+    } catch (err) {
+        res.status(401).json({ errors: "please authenticate with a valid token", issue: err });
     }
-    catch(err){
-
-    }
-
-
 }
 
 
 
-            
