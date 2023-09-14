@@ -4,6 +4,7 @@ const { descriptions } = require('../../helper/form/fieldDesc');
 
 // This middleware funciton is used to validate the validation array
 exports.validateValidationResult = (req, res, next) => {
+    
     // validating errors for authentication (creating user)
     const result = validationResult(req);
 
