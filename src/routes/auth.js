@@ -1,9 +1,9 @@
 // importing requirements
 const express = require('express');
 const router = express.Router();
-const { createUser, loginUser } = require('../../controllers/user');
-const { validateRegistrationField, validateLoginField }  = require('../../middleware/validator/validateFormField');
-const { validateValidationResult } = require('../../middleware/validator/validationMiddleware');
+const { createUser, loginUser } = require('../controllers/user');
+const { validateRegistrationField, validateLoginField }  = require('../middleware/validator/validateFormField');
+const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
 
 // Route 1: To create user: '/api/v1/auth/user' [using POST] (login not required)

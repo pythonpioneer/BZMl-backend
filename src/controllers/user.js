@@ -35,11 +35,11 @@ const createUser = async (req, res) => {
 
             // generating authToken when user created
             const authToken = generateToken(payloadData);
-            res.status(200).json({"status": 200, "message": "user created", "auth-token": authToken});
+            res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
         })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
-            errors: "Internal server error", 
+            errors: "Internal server error",
             issue: err
         }));
 };
@@ -48,19 +48,19 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
 
     try {  // now confirm authentication
-        
+
         let user;
         const { userfield, password } = req.body;  // fetching values from request body
 
         /* find the user with given email/id/no. and validate, if user exists 
         now, find the type of user field */
-        if(isNumber (userfield))
-            user = await User.findOne({mobileNumber: userfield});  // login with mobile no.
+        if (isNumber(userfield))
+            user = await User.findOne({ mobileNumber: userfield });  // login with mobile no.
         else user = await User.findOne({ email: userfield });  // login with email
-        
+
         // if user doesn't exist or wrong input fields
-        if(!user) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
-        
+        if (!user) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
+
         // now, compare the password using bcrypt.js
         const isPasswordMatches = comparePassword(password, user.password);
         if (!isPasswordMatches) return res.status(400).json({ status: 400, message: "Invalid Credentials" });  // password not matched
@@ -74,13 +74,26 @@ const loginUser = async (req, res) => {
 
         // generate auth-token send it
         const authToken = generateToken(payloadData)
-        res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken});
+        res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken });
 
-    } catch(err){
+    } catch (err) {
         res.status(500).json({  // any unrecogonize error will be raised from here
-            errors: "Internal server error", issue: err
+            errors: "Internal server error",
+            issue: err
         })
     }
 };
 
-module.exports = { createUser, loginUser };
+// to get the user details using user id
+const getUser = async (req, res) => {
+
+    try {  // find user by id
+        const user = await User.findById(req.user.id)
+            .select('-password');  // not fetch password from db
+        res.status(200).json({ "status": 200, "message": "User Found", "data": user });
+    } catch (err) {
+        res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+    }
+}
+
+module.exports = { createUser, loginUser, getUser };
