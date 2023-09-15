@@ -47,6 +47,10 @@ const userSchema = new Schema({
         type: String,
         default: "India"
     },
+    myCash: {
+        type: Number,
+        default: 0,
+    },
     timestamp: {
         type: Date,
         default: Date.now,
