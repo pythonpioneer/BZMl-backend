@@ -151,4 +151,24 @@ const setUserDetails = async (req, res) => {
 
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails };
+// to delete the user account
+const deleteUserAccount = async (req, res) => {
+
+    try{  // find the user that to be deleted
+        // and confirms the user identity
+        let user = await User.findById(req.user.id);
+        if(!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+
+        // if not admin then delete (issue-12)
+
+        // now, delete the user
+        user = await User.findByIdAndDelete(req.user.id);
+        return res.status(200).json({ status: 200, message: 'user deleted', user: user });
+
+    } catch(err) {
+        res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount };
