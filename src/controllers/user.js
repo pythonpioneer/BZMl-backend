@@ -12,6 +12,19 @@ const createUser = async (req, res) => {
     const securePassword = generatePassword(req.body.password);
     let gender = req.body.gender;
     gender = gender.toUpperCase();
+    
+    // fields to update user data
+    let cash = 0;
+
+    // find the ref-id
+    if (req.body?.refCode) {
+        let refUser = await User.findOne({ email: req.body.refCode });
+        
+        // if reffered user exist then
+        refUser.myCash += 50;
+        cash = 50;
+        refUser.save();
+    }
 
     // create the user in db
     User.create({
@@ -24,8 +37,9 @@ const createUser = async (req, res) => {
         gender: gender,
         refCode: req.body.refCode ? req.body.refCode : null,
         isVerified: false,
+        myCash: cash,
     })
-        .then((user) => {  // sending response, when user is created
+        .then( async (user) => {  // sending response, when user is created
 
             // sending user id as payload, because accesssing data using id is easier
             const payloadData = {
