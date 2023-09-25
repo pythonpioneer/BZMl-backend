@@ -22,6 +22,7 @@ app.use(cors());
 // all availble routing for the api
 app.use(APIPATH + 'auth', require('./routes/auth.js'));
 app.use(APIPATH + 'user', require('./routes/user.js'));
+app.use(APIPATH + 'admin', require('./routes/admin.js'));
 
 // running the app
 app.listen(PORT, () => {

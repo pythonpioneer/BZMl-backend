@@ -15,7 +15,7 @@ exports.validateValidationResult = (req, res, next) => {
         desc: descriptions[result["errors"][0]?.path]
     };
 
-    // user will not create
+    // user will not created
     if (!result.isEmpty()) return res.status(400).json(obj);
 
     next();  // to pass controls to the next function

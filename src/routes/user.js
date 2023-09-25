@@ -6,13 +6,13 @@ const { validateUpdationField } = require('../middleware/validator/validateFormF
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = express.Router();
 
-// Route 3: To get logged in user detail: '/api/v1/user/getuser' [using GET] (login required)
+// Route 3: To get logged in user detail: '/bzml/api/v1/user/getuser' [using GET] (login required)
 router.get('/getuser', fetchUser, getUserDetails);
 
-// Route 4: To update logged in user detail: '/api/v1/user/user' [using PUT] (login required)
+// Route 4: To update logged in user detail: '/bzml/api/v1/user/user' [using PUT] (login required)
 router.put('/user', validateUpdationField, validateValidationResult, fetchUser, setUserDetails);
 
-// Route 4: To delete a logged in user account: '/api/v1/user/delete-user' [using DELETE] (login required)
+// Route 5: To delete a logged in user account: '/bzml/api/v1/user/delete-user' [using DELETE] (login required)
 router.delete('/delete-user', fetchUser, deleteUserAccount);
 
 // export router
