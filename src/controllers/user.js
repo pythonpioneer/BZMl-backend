@@ -50,7 +50,7 @@ const createUser = async (req, res) => {
 
             // generating authToken when user created
             const authToken = generateToken(payloadData);
-            res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
+            return res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
         })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here

@@ -26,9 +26,6 @@ const adminSchema = new Schema({
         type: String,
         required: true,
     },
-    refCode: {
-        type: String,
-    },
     isVerified: {
         type: Boolean,
         required: true,
@@ -38,7 +35,7 @@ const adminSchema = new Schema({
         type: String,
         default: "India"
     },
-    myCash: {
+    refCount: {
         type: Number,
         default: 0,
     },
