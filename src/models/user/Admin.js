@@ -3,17 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // creating schema for users
-const userSchema = new Schema({
-    pubgID: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    pubgName: {
-        type: String,
-        required: true,
-        unique: true,
-    },
+const adminSchema = new Schema({
     fullName: {
         type: String,
         required: true,
@@ -41,8 +31,8 @@ const userSchema = new Schema({
     },
     isVerified: {
         type: Boolean,
-        default: false,
         required: true,
+        default: false,
     },
     country: {
         type: String,
@@ -58,5 +48,5 @@ const userSchema = new Schema({
     }
 });
 
-const User = mongoose.model('user', userSchema);
-module.exports = User;
+const Admin = mongoose.model('admin', adminSchema);
+module.exports = Admin;
