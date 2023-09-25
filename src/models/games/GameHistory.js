@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // now, create the game model
-const gameSchema = new Schema({
+const previousGameSchema = new Schema({
     host: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin',
@@ -17,14 +17,6 @@ const gameSchema = new Schema({
         type: String,
         required: true,
     },
-    roomId: {
-        type: String,
-        required: true
-    },
-    roomPass: {
-        type: String,
-        required: true,
-    },
     prizePool: {
         type: Number,
         required: true,
@@ -35,11 +27,10 @@ const gameSchema = new Schema({
     },
     timeStamp: {
         type: Date,
-        expires: 100,
         default: Date.now(),
     }
 });
 
 // export the model
-const Game = mongoose.model('game', gameSchema);
-module.exports = Game;
+const PreviousGames = mongoose.model('previousGames', previousGameSchema);
+module.exports = PreviousGames;
