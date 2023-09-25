@@ -11,7 +11,7 @@ const connectToMongo = async () => {
         useUnifiedTopology: true,
     })
         .then(() => {
-            console.info("Coneection successfull, " + "connected to MongoDB");
+            console.info("Coneection Successfull, " + "Connected to MongoDB");
         })
         .catch((err) => {
             console.log("Coneection Interrupted");
