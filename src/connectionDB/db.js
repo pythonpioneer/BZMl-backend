@@ -3,11 +3,13 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // mongodb setup
-const mongoURI = 'mongodb://localhost:27017/bzml';
-console.log(process.env.MONGO_URI);
+const mongoURI = process.env.MONGODB_URI;
 
 const connectToMongo = async () => {
-    mongoose.connect(mongoURI)
+    mongoose.connect(mongoURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
         .then(() => {
             console.info("Coneection successfull, " + "connected to MongoDB");
         })
