@@ -72,5 +72,17 @@ const loginAdmin = async (req, res) => {
     }
 };
 
+// to fetch the admin details
+const getAdminDetails = async (req, res) => {
+    try {  // find the admin by id
+
+        const admin = await Admin.findById(req.user.id).select('-password');
+        return res.status(200).json({ "status": 200, "message": "Admin Found", "data": admin });
+
+    } catch (err) {
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+    }
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin };
+module.exports = { createAdmin, loginAdmin, getAdminDetails };
