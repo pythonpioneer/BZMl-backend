@@ -24,7 +24,7 @@ const createAdmin = async (req, res) => {
 
     })
         .then(user => {  // sending response when admin created
-            return res.status(200).json({ "status": 200, "message": "user created", "admin": user });
+            return res.status(200).json({ "status": 200, "message": "Admin Created", "admin": user });
         })
         .catch(err => {
             return res.status(500).json({  // any unrecogonize error will be raised from here
@@ -62,7 +62,7 @@ const loginAdmin = async (req, res) => {
 
         // now, generate the token and send it
         const authToken = generateToken(payload);
-        return res.status(200).json({ status: 200, message: "User Logged In", 'auth-token': authToken })
+        return res.status(200).json({ status: 200, message: "Admin Logged In", 'auth-token': authToken })
 
     } catch( err) {
         return res.status(500).json({  // any unrecogonize error will be raised from here
