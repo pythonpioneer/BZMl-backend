@@ -84,5 +84,19 @@ const getAdminDetails = async (req, res) => {
     }
 };
 
+// to delete the admin
+const deleteAdmin = async (req, res) => {
+    res.send("OK! Default!!");  
+
+    try {  // find the admin and delete it
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(404).json({ status: 404, message: "User Not Found" });
+        
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin };
