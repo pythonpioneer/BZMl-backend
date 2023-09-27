@@ -91,7 +91,10 @@ const deleteAdmin = async (req, res) => {
     try {  // find the admin and delete it
         let admin = await Admin.findById(req.user.id);
         if (!admin) return res.status(404).json({ status: 404, message: "User Not Found" });
-        
+
+        // now match the password
+        const password = req.body.password;
+        // to doo..
 
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
