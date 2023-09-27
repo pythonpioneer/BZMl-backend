@@ -126,5 +126,24 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// get all admin informations
+const getAllAdmins = async (req, res) => {
+    try {
+        // confirm that the user is admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, get all the admin list
+        let admins = await Admin.find({}).select('-password');
+        if (!admins) return res.status(400).json({ status: 400, message: "user not found", data: admins });
+
+        // now, return all admin data to the admin
+        return res.status(200).json({ status: 200, message: "users found", data: admins })
+
+    } catch (err) {
+        res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins };
