@@ -1,6 +1,7 @@
 // importing all requirements
 const express = require('express');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin } = require('../controllers/admin');
+const { body } = require('express-validator');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -20,7 +21,18 @@ router.post('/', validateLoginField, validateValidationResult, loginAdmin);
 router.get('/', fetchUser, getAdminDetails);
 
 // Route 4: To delte the logged in admin: '/bzml/api/v1/admin/delete-admin' [using DELETE] (login required)
-router.delete('/delete-admin', fetchUser, deleteAdmin);
+router.delete('/delete-admin', [
+    body('password', "Enter valid password")
+        .isAlphanumeric()
+        .isLength({min: 6, max: 18})
+    ],
+    validateValidationResult,
+    fetchUser, 
+    deleteAdmin
+    );
+
+// Route 5: To access all users information (only admin to access): '/bzml/api/v1/admin/get-all-users' [using GET] (login required)
+router.get('/get-all-users', fetchUser, getAllUsers);
 
 // export the router
 module.exports = router;
