@@ -84,5 +84,25 @@ const getAdminDetails = async (req, res) => {
     }
 };
 
+// to delete the admin
+const deleteAdmin = async (req, res) => {
+    
+    try {  // find the admin and delete it
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now match the password
+        const password = req.body.password;
+        if (!comparePassword(password, admin.password)) return res.status(400).json({status: 400, message: "Invalid Credentials"});
+
+        // now, delete the user
+        admin = await Admin.findByIdAndDelete(req.user.id);
+        return res.status(200).json({ status: 200, message: 'Admin Deleted', user: admin });
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", message: "You need to send Password in request body", issue: err });
+    }
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin };
