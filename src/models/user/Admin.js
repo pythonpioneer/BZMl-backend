@@ -26,10 +26,10 @@ const adminSchema = new Schema({
         type: String,
         required: true,
     },
-    isVerified: {
+    superUser: {
         type: Boolean,
-        required: true,
         default: false,
+        required: true,
     },
     country: {
         type: String,
