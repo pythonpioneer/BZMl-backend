@@ -11,5 +11,11 @@ const router = express.Router();
 // Route 1: To create an admin: '/bzml/api/v1/admin/create-admin' [using POST] (login not required)
 router.post('/create-admin', validateRegField, validateValidationResult, createAdmin);
 
+// Route 2: To get the admin details: '/bzml/api/v1/admin/' [using GETT] (login not required)
+router.get('/', (req, res) => {
+    console.log("OK! Default!");
+    return res.send("OK! Default!");
+});
+
 // export the router
 module.exports = router;
