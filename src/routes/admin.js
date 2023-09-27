@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -20,7 +20,7 @@ router.post('/', validateLoginField, validateValidationResult, loginAdmin);
 // Route 3: To get the admin details: '/bzml/api/v1/admin/' [using GET] (login required)
 router.get('/', fetchUser, getAdminDetails);
 
-// Route 4: To delte the logged in admin: '/bzml/api/v1/admin/delete-admin' [using DELETE] (login required)
+// Route 4: To delete the logged in admin: '/bzml/api/v1/admin/delete-admin' [using DELETE] (login required)
 router.delete('/delete-admin', [
     body('password', "Enter valid password")
         .isAlphanumeric()
@@ -29,13 +29,24 @@ router.delete('/delete-admin', [
     validateValidationResult,
     fetchUser, 
     deleteAdmin
-    );
+);
 
 // Route 5: To access all users information (only admin to access): '/bzml/api/v1/admin/get-all-users' [using GET] (login required)
 router.get('/get-all-users', fetchUser, getAllUsers);
 
 // Route 6: To access all admin information (only admin to access): '/bzml/api/v1/admin/get-all-admins' [using GET] (login required)
 router.get('/get-all-admin', fetchUser, getAllAdmins);
+
+// Route 7: To delete any user (only admin access): '/bzml/api/v1/admin/delete-the-user?user-id=<user id>' [using DELETE] (login required)
+router.delete('/delete-the-user', [
+    body('password', "Enter valid password")
+        .isAlphanumeric()
+        .isLength({min: 6, max: 18})
+    ],
+    validateValidationResult,
+    fetchUser, 
+    deleteAnyUser
+);
 
 // export the router
 module.exports = router;
