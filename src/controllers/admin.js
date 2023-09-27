@@ -24,7 +24,7 @@ const createAdmin = async (req, res) => {
 
     })
         .then(user => {  // sending response when admin created
-            return res.status(200).json({ "status": 200, "message": "user created", "admin": user });
+            return res.status(200).json({ "status": 200, "message": "Admin Created", "admin": user });
         })
         .catch(err => {
             return res.status(500).json({  // any unrecogonize error will be raised from here
@@ -62,7 +62,7 @@ const loginAdmin = async (req, res) => {
 
         // now, generate the token and send it
         const authToken = generateToken(payload);
-        return res.status(200).json({ status: 200, message: "User Logged In", 'auth-token': authToken })
+        return res.status(200).json({ status: 200, message: "Admin Logged In", 'auth-token': authToken })
 
     } catch( err) {
         return res.status(500).json({  // any unrecogonize error will be raised from here
@@ -72,5 +72,17 @@ const loginAdmin = async (req, res) => {
     }
 };
 
+// to fetch the admin details
+const getAdminDetails = async (req, res) => {
+    try {  // find the admin by id
+
+        const admin = await Admin.findById(req.user.id).select('-password');
+        return res.status(200).json({ "status": 200, "message": "Admin Found", "data": admin });
+
+    } catch (err) {
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+    }
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin };
+module.exports = { createAdmin, loginAdmin, getAdminDetails };
