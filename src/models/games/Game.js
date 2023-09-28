@@ -34,10 +34,25 @@ const gameSchema = new Schema({
         type: Number,
         required: true,
     },
-    timeStamp: {
+    currPlayers: {
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    maxPlayers: {
+        type: Number,
+        default: 100,
+        required: true,
+    },
+    isGameStarted: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
+    timeStamp: {  // after 3 hrs, the record will be deleted
         type: Date,
-        expires: 100,
-        default: Date.now(),
+        expires: 10800,  
+        default: Date.now,
     }
 });
 

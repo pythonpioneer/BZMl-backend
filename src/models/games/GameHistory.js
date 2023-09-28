@@ -26,9 +26,14 @@ const previousGameSchema = new Schema({
         type: Number,
         required: true,
     },
+    totalPlayers: {
+        type: Number,
+        default: 0,  // update this field when game started (isGameStarted=true)
+        required: true,
+    },
     timeStamp: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
     }
 });
 
