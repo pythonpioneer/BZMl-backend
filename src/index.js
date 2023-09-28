@@ -23,6 +23,7 @@ app.use(cors());
 app.use(APIPATH + 'auth', require('./routes/auth.js'));
 app.use(APIPATH + 'user', require('./routes/user.js'));
 app.use(APIPATH + 'admin', require('./routes/admin.js'));
+app.use(APIPATH + 'games', require('./routes/games.js'));
 
 // running the app
 app.listen(PORT, () => {

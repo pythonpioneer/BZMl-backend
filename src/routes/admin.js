@@ -24,10 +24,10 @@ router.get('/', fetchUser, getAdminDetails);
 router.delete('/delete-admin', [
     body('password', "Enter valid password")
         .isAlphanumeric()
-        .isLength({min: 6, max: 18})
-    ],
+        .isLength({ min: 6, max: 18 })
+],
     validateValidationResult,
-    fetchUser, 
+    fetchUser,
     deleteAdmin
 );
 
@@ -41,10 +41,10 @@ router.get('/get-all-admin', fetchUser, getAllAdmins);
 router.delete('/delete-the-user', [
     body('password', "Enter valid password")
         .isAlphanumeric()
-        .isLength({min: 6, max: 18})
-    ],
+        .isLength({ min: 6, max: 18 })
+],
     validateValidationResult,
-    fetchUser, 
+    fetchUser,
     deleteAnyUser
 );
 
@@ -52,10 +52,10 @@ router.delete('/delete-the-user', [
 router.delete('/delete-the-admin', [
     body('password', "Enter valid password")
         .isAlphanumeric()
-        .isLength({min: 6, max: 18})
-    ],
+        .isLength({ min: 6, max: 18 })
+],
     validateValidationResult,
-    fetchUser,  
+    fetchUser,
     deleteAnyAdmin
 );
 

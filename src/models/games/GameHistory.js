@@ -11,6 +11,7 @@ const previousGameSchema = new Schema({
     },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
+        default: "BGMI",
         required: true,
     },
     gamingMode: {  // ( SOLO | DUO | SQUAD )
@@ -25,9 +26,14 @@ const previousGameSchema = new Schema({
         type: Number,
         required: true,
     },
+    totalPlayers: {
+        type: Number,
+        default: 0,  // update this field when game started (isGameStarted=true)
+        required: true,
+    },
     timeStamp: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
     }
 });
 
