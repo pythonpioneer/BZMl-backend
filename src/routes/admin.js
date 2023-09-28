@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -46,6 +46,17 @@ router.delete('/delete-the-user', [
     validateValidationResult,
     fetchUser, 
     deleteAnyUser
+);
+
+// Route 8: To delete any admin (only admin access): '/bzml/api/v1/admin/delete-the-admin?user-id=<user id>' [using DELETE] (login required)
+router.delete('/delete-the-admin', [
+    body('password', "Enter valid password")
+        .isAlphanumeric()
+        .isLength({min: 6, max: 18})
+    ],
+    validateValidationResult,
+    fetchUser,  
+    deleteAnyAdmin
 );
 
 // export the router

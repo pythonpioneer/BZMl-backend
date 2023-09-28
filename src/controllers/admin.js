@@ -167,9 +167,37 @@ const deleteAnyUser = async (req, res) => {
         return res.status(200).json({ status: 200, message: 'User Deleted', user: user });
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+// to delete any admin
+const deleteAnyAdmin = async (req, res) => {
+    try {  
+        // fetch the id and the password from the query and body
+        const adminId = req.query['admin-id'];
+        const password = req?.body?.password;
+
+        // confirm that the given admin exists
+        let admin = await Admin.findById(adminId);
+        if (!admin) return res.status(404).json({ status: 404, message: "admin not found"});
+
+        // now, match the password of the curr admin
+        let currAdmin = await Admin.findById(req.user.id);
+        if (!comparePassword(password, currAdmin.password)) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
+
+        // now confirm that the request is maid from the superuser
+        if (!currAdmin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+        if (!currAdmin.superUser) return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Super User Access Only!!" });
+
+        // now, delete the admin
+        admin = await Admin.findByIdAndDelete(adminId);
+        return res.status(200).json({ status: 200, message: 'Admin Deleted', user: admin });
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
 
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin };
