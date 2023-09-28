@@ -11,6 +11,7 @@ const previousGameSchema = new Schema({
     },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
+        default: "BGMI",
         required: true,
     },
     gamingMode: {  // ( SOLO | DUO | SQUAD )
