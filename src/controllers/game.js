@@ -26,7 +26,7 @@ const createGame = async (req, res) => {
             maxPlayer: maxPlayer,
         })
             .then((game) => {
-                
+
                 // now push the game data into game history
                 GameHistory.create({
                     host: req.user.id,
@@ -46,12 +46,32 @@ const createGame = async (req, res) => {
             .catch(err => {
                 return res.status(500).json({ errors: "Internal server error", issue: err });
             });
-        
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+// to get all current games
+const getGames = async (req, res) => {
+    try {
+
+        // fetch the gametype and 
+        const gameType = req.query['gametype']?.toLowerCase();
+
+        /* Authentication is not required to get all the current list of games */
+        if (gameType === 'current') {  
+            let game = await Game.find();  // then return all the current game list
+            return res.status(200).json({ status: 200, message: "Games found", games: game })
+        }
+        return res.status(404).json({ status: 404, message: "query not found" });
+
+
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
 
 // exporting required methods
-module.exports = { createGame };
+module.exports = { createGame, getGames };
 
