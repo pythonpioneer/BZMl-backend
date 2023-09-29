@@ -22,7 +22,7 @@ router.post('/create-game', [
     createGame
 );
 
-// Route 2: To get all current games list: '/bzml/api/v1/games/game' [using GET] (login not required)
+// Route 2: To get all current games list: '/bzml/api/v1/games/game?gametype=<...>' [using GET] { gametype=current: (login not required) | (login access with more fields), gametype=previous: (login required) }
 router.get('/game', fetchUser, getGames);
 
 // export the router
