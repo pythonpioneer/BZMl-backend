@@ -9,6 +9,11 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'game',
+        required: true,
+    },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
         default: "BGMI",
@@ -30,6 +35,15 @@ const previousGameSchema = new Schema({
         type: Number,
         default: 0,  // update this field when game started (isGameStarted=true)
         required: true,
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    deletedOn: {
+        type: Date,
+    },
+    gameStatus: {
+        type: String,
     },
     timeStamp: {
         type: Date,
