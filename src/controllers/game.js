@@ -52,18 +52,29 @@ const createGame = async (req, res) => {
     }
 };
 
-// to get all current games
+/* Authentication is not required to get all the current list of games but,
+to get all games list authentication is required of user */
 const getGames = async (req, res) => {
     try {
 
         // fetch the gametype and 
         const gameType = req.query['gametype']?.toLowerCase();
 
-        /* Authentication is not required to get all the current list of games */
+        // to get all the current game list (login not required)
         if (gameType === 'current') {  
-            let game = await Game.find();  // then return all the current game list
+            let game = await Game.find(); 
             return res.status(200).json({ status: 200, message: "Games found", games: game })
         }
+
+        // to get all the game list (login required)
+        if (gameType === 'previous') {
+            
+            // validating that the user is registerd as admin
+            let user = await Admin.findById(req.user.id);
+
+            // validating that the user is registerd as user
+        }
+
         return res.status(404).json({ status: 404, message: "query not found" });
 
 
