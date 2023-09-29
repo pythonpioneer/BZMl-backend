@@ -116,7 +116,7 @@ const getAllUsers = async (req, res) => {
 
         // now, get all the users list
         let users = await User.find({}).select('-password');
-        if (!users) return res.status(400).json({ status: 400, message: "user not found", data: users });
+        if (!users) return res.status(404).json({ status: 404, message: "user not found", data: users });
 
         // now, return all user data to the admin
         return res.status(200).json({ status: 200, message: "users found", data: users })

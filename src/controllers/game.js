@@ -93,7 +93,7 @@ const getGames = async (req, res) => {
 
             // now fetch the game and send it in response
             game = await Game.find().select(notFetched);
-            return res.status(200).json({ status: 200, message: "Games found", games: game });  // the game arr can be empty, if there is no game in the db.
+            return res.status(200).json({ status: 200, message: "Games found", totalGames: game.length, games: game });  // the game arr can be empty, if there is no game in the db.
         }
 
         // to get all the game list (login required)
@@ -107,7 +107,7 @@ const getGames = async (req, res) => {
             if (user) {
                 // return all game data
                 game = await GameHistory.find();
-                return res.status(200).json({ status: 200, message: "Games found", games: game });
+                return res.status(200).json({ status: 200, message: "Games found", totalGames: game.length, games: game });
             }
 
             // validating that the user is registerd as user
@@ -115,7 +115,7 @@ const getGames = async (req, res) => {
             if (user) {
                 // now return the some previous game information 
                 game = await GameHistory.find().select('-host');
-                return res.status(200).json({ status: 200, message: "Games found", games: game });
+                return res.status(200).json({ status: 200, message: "Games found", totalGames: game.length, games: game });
             }
 
             // if the requested user is not admin and any user.
@@ -131,7 +131,20 @@ const getGames = async (req, res) => {
 
 // to delete a game
 const deleteGame = async (req, res) => {
-    res.send("ok");
+    try {  
+
+        // fetch the game id from query
+        const gameId = req.query['game-id'];
+
+        // confirm that the game id exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found" });
+
+        res.send(gameId)
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
 };
 
 // exporting required methods
