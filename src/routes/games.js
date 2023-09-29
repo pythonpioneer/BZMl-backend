@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { createGame, getGames } = require('../controllers/game');
+const { createGame, getGames, deleteGame } = require('../controllers/game');
 const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
@@ -24,6 +24,9 @@ router.post('/create-game', [
 
 // Route 2: To get all current games list: '/bzml/api/v1/games/game?gametype=<...>' [using GET] { gametype=current: (login not required) | (login access with more fields), gametype=previous: (login required) }
 router.get('/game', fetchAnyUser, getGames);
+
+// Route 3: To delete the game (only admin to access): '/bzml/api/v1/games/delete-game?game-id=<...>' [using DELETE] (login required)
+router.delete('/delete-game', fetchUser, deleteGame);
 
 // export the router
 module.exports = router;

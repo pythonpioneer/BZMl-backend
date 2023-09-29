@@ -129,6 +129,11 @@ const getGames = async (req, res) => {
     }
 };
 
+// to delete a game
+const deleteGame = async (req, res) => {
+    res.send("ok");
+};
+
 // exporting required methods
-module.exports = { createGame, getGames };
+module.exports = { createGame, getGames, deleteGame };
 
