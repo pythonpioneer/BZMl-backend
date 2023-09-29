@@ -2,7 +2,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { createGame, getGames } = require('../controllers/game');
-const { fetchUser } = require('../middleware/auth/authMiddleware');
+const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
 // now creating router, to map all routes
@@ -23,7 +23,7 @@ router.post('/create-game', [
 );
 
 // Route 2: To get all current games list: '/bzml/api/v1/games/game?gametype=<...>' [using GET] { gametype=current: (login not required) | (login access with more fields), gametype=previous: (login required) }
-router.get('/game', fetchUser, getGames);
+router.get('/game', fetchAnyUser, getGames);
 
 // export the router
 module.exports = router;
