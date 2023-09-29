@@ -61,16 +61,19 @@ const getGames = async (req, res) => {
         const gameType = req.query['gametype']?.toLowerCase();
 
         // to get all the current game list (login not required)
-        if (gameType === 'current') {  
-            const notFetched = ['-roomPass', '-roomId', '-currPlayer', '-isGameStarted'];
-            
-            let game = await Game.find().select(notFetched); 
-            return res.status(200).json({ status: 200, message: "Games found", games: game })
+        if (gameType === 'current') {
+
+            let notFetched = [];  // if user is logged in 
+            if (!req?.user?.id)  // if user is not logged in
+                notFetched = ['-roomPass', '-roomId', '-currPlayer', '-isGameStarted'];
+
+            let game = await Game.find().select(notFetched);
+            return res.status(200).json({ status: 200, message: "Games found", games: game });  // the game arr can be empty, if there is no game in the db.
         }
 
         // to get all the game list (login required)
         if (gameType === 'previous') {
-            
+
             // validating that the user is registerd as admin
             let user = await Admin.findById(req.user.id);
 
