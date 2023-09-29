@@ -1,5 +1,6 @@
 // Imporiting all requirements
 const Admin = require("../models/user/Admin");
+const User = require("../models/user/User");
 const Game = require("../models/games/Game");
 const GameHistory = require("../models/games/GameHistory");
 
@@ -59,29 +60,69 @@ const getGames = async (req, res) => {
 
         // fetch the gametype and 
         const gameType = req.query['gametype']?.toLowerCase();
+        let game;
 
         // to get all the current game list (login not required)
         if (gameType === 'current') {
 
-            let notFetched = [];  // if user is logged in 
-            if (!req?.user?.id)  // if user is not logged in
-                notFetched = ['-roomPass', '-roomId', '-currPlayer', '-isGameStarted'];
+            // value that shouldn't be fetched (default if user is logged in as user)
+            let notFetched = ['-host'];
 
-            let game = await Game.find().select(notFetched);
+            // now, check that the user is logged in or not
+            if (req?.user?.id) {  // user is logged in
+
+                // now, fetch the user
+                const user = await User.findById(req.user.id);
+
+                // now verify the user
+                if (!user) {  // user can be admin
+
+                    // check that the user is admin or not
+                    const admin = await Admin.findById(req.user.id);
+
+                    if (admin) notFetched = [];
+                    else return res.status(404).json({ status: 404, message: "User Not Found" });
+
+                }
+                else notFetched = ['-host'];  // if user is logged in as user
+
+            }
+            else {  // user is not logged in
+                notFetched.push(...['-roomPass', '-roomId', '-currPlayers', '-isGameStarted']);  // don't fetch these values
+            }
+
+            // now fetch the game and send it in response
+            game = await Game.find().select(notFetched);
             return res.status(200).json({ status: 200, message: "Games found", games: game });  // the game arr can be empty, if there is no game in the db.
         }
 
         // to get all the game list (login required)
         if (gameType === 'previous') {
 
+            // validate the user is logged in 
+            if (!req?.user?.id) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
             // validating that the user is registerd as admin
             let user = await Admin.findById(req.user.id);
+            if (user) {
+                // return all game data
+                game = await GameHistory.find();
+                return res.status(200).json({ status: 200, message: "Games found", games: game });
+            }
 
             // validating that the user is registerd as user
+            user = await User.findById(req.user.id);
+            if (user) {
+                // now return the some previous game information 
+                game = await GameHistory.find().select('-host');
+                return res.status(200).json({ status: 200, message: "Games found", games: game });
+            }
+
+            // if the requested user is not admin and any user.
+            else return res.status(404).json({ status: 404, message: "User Not Found" });
         }
 
-        return res.status(404).json({ status: 404, message: "query not found" });
-
+        else return res.status(404).json({ status: 404, message: "query not found" });
 
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
