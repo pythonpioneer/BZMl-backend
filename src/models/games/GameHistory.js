@@ -36,6 +36,15 @@ const previousGameSchema = new Schema({
         default: 0,  // update this field when game started (isGameStarted=true)
         required: true,
     },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    deletedOn: {
+        type: Date,
+    },
+    gameStatus: {
+        type: String,
+    },
     timeStamp: {
         type: Date,
         default: Date.now,

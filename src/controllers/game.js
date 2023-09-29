@@ -147,28 +147,13 @@ const deleteGame = async (req, res) => {
             prizePool: game.prizePool,
             entryFee: game.entryFee,
             deletedBy: req.user.id,
-            deleteOn: Date.now(),
-            gameStatus: game.isGameStarted ? "passed" : "failed",
+            deletedOn: Date.now(),
+            gameStatus: game.isGameStarted ? "game started" : "game didn't started",
         };
         
         // now, push the data into gameHistory with gameStatus=failed and gameDeletedOn=<current date>
-        game = await GameHistory.findByIdAndUpdate();
-        // GameHistory.create({
-            // host: game.host.toString(),
-            // gamingPlatform: game.gamingPlatform,
-            // gamingMode: game.gamingMode,
-            // prizePool: game.prizePool,
-            // entryFee: game.entryFee,
-            // deletedBy: req.user.id,
-            // deleteOn: Date.now(),
-            // gameStatus: game.isGameStarted ? "passed" : "failed",
-        // })
-        //     .then((game) => {
-        //         return res.status(200).json({ "status": 200, "message": "Game Deleted", "game": game });
-        //     })
-        //     .catch((err) => {
-                
-        //     });
+        let status = await GameHistory.updateOne({ gameId: game._id }, { $set: newGame }, { new: true });
+        return res.status(200).json({ "status": 200, "message": "Game Deleted" });
     }
 
     try {
