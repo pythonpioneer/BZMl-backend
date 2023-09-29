@@ -62,7 +62,9 @@ const getGames = async (req, res) => {
 
         // to get all the current game list (login not required)
         if (gameType === 'current') {  
-            let game = await Game.find(); 
+            const notFetched = ['-roomPass', '-roomId', '-currPlayer', '-isGameStarted'];
+            
+            let game = await Game.find().select(notFetched); 
             return res.status(200).json({ status: 200, message: "Games found", games: game })
         }
 
