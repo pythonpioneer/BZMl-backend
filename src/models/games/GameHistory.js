@@ -9,6 +9,11 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'game',
+        required: true,
+    },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
         default: "BGMI",

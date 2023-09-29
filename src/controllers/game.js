@@ -27,10 +27,10 @@ const createGame = async (req, res) => {
             maxPlayer: maxPlayer,
         })
             .then((game) => {
-
                 // now push the game data into game history
                 GameHistory.create({
                     host: req.user.id,
+                    gameId: game._id,
                     gamingPlatform: game.gamingPlatform,
                     gamingMode: game.gamingMode,
                     prizePool: prizePool,
@@ -131,7 +131,47 @@ const getGames = async (req, res) => {
 
 // to delete a game
 const deleteGame = async (req, res) => {
-    try {  
+
+    /* this method is not for export, it is used inside the game.js
+    In this method host or superuser want to delete the game. (don't export) */
+    async function _deleteGame(gameId, Game, GameHistory) {
+        
+        // now, delete the game from Game table
+        let game = await Game.findByIdAndDelete(gameId);
+
+        // creating a game to update in game history
+        let newGame = {
+            host: game.host.toString(),
+            gamingPlatform: game.gamingPlatform,
+            gamingMode: game.gamingMode,
+            prizePool: game.prizePool,
+            entryFee: game.entryFee,
+            deletedBy: req.user.id,
+            deleteOn: Date.now(),
+            gameStatus: game.isGameStarted ? "passed" : "failed",
+        };
+        
+        // now, push the data into gameHistory with gameStatus=failed and gameDeletedOn=<current date>
+        game = await GameHistory.findByIdAndUpdate();
+        // GameHistory.create({
+            // host: game.host.toString(),
+            // gamingPlatform: game.gamingPlatform,
+            // gamingMode: game.gamingMode,
+            // prizePool: game.prizePool,
+            // entryFee: game.entryFee,
+            // deletedBy: req.user.id,
+            // deleteOn: Date.now(),
+            // gameStatus: game.isGameStarted ? "passed" : "failed",
+        // })
+        //     .then((game) => {
+        //         return res.status(200).json({ "status": 200, "message": "Game Deleted", "game": game });
+        //     })
+        //     .catch((err) => {
+                
+        //     });
+    }
+
+    try {
 
         // fetch the game id from query
         const gameId = req.query['game-id'];
@@ -140,12 +180,28 @@ const deleteGame = async (req, res) => {
         let game = await Game.findById(gameId);
         if (!game) return res.status(404).json({ status: 404, message: "game not found" });
 
-        res.send(gameId)
+        // now, confirm that the request is maid by admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, confirm that the host of the game is same as the requested admin or superuser
+        if (admin._id === game.host.toString()) {  // game host want to delete the game
+
+            // now, delete the game
+            _deleteGame(gameId, Game, GameHistory);
+        }
+        else if (admin.superUser) {  // if admin is superuser
+
+            // now, delete the game
+            _deleteGame(gameId, Game, GameHistory);
+        }
+        else return res.status(401).json({ status: 401, message: "Access Denied!!" });  // any other admin want to delete the game
 
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
+
 
 // exporting required methods
 module.exports = { createGame, getGames, deleteGame };
