@@ -1,35 +1,32 @@
-const { body, validationResult } = require('express-validator');
-const User = require('../../models/user/User');
+// importing all requirements
+const { body } = require('express-validator');
+const { findRecord } = require('../../helper/utility/findDb');
 
+
+// validate basic fields, which get duplicated in validateRetistration fields and in validateUpdation fields
+const _validateBaseFields = [  // add fields that can be updated only
+    body('pubgName', 'Enter your PUBG/BGMI name').isLength({ min: 1, max: 30 }).custom(async (pubgName) => await findRecord('User', { pubgName })),  // using find record method to find the data in the given database.
+    body('fullName', 'Enter a valid full name').isLength({ min: 3, max: 25 }),
+    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }).custom(async (email) => await findRecord('User', { email })),
+    body('mobileNumber', 'Enter a valid mobile number').isNumeric().isLength({ min: 10, max: 10 }).custom(async (mobileNumber) => await findRecord('User', { mobileNumber })),
+    body('gender', 'Enter gender initials').isAlpha().isLength({ min: 1, max: 1 }),
+];
+
+// adding extra fields to validate the user input
+const _validateMoreFields = [  // add fields that can not be updated
+    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }).custom(async (pubgID) => await findRecord('User', { pubgID })),
+    body('password', 'Enter a valid password').isAlphanumeric().isLength({ min: 6, max: 18 }),
+    body('refCode', 'Enter refral code (not required)').isLength({ max: 50 }),
+]
 
 // A validation array to validate user input field for registration
 exports.validateRegistrationField = [
 
-    // validating all input data to create user
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }).custom(async (pubgID) => {
+    ..._validateBaseFields,  // contain { pubgName, fullName, email, moblieNumber, gender }
+    ..._validateMoreFields, // contain { pubgId, password, refCode }
 
-        // find any user with the given id
-        if (await User.findOne({ pubgID })) throw new Error('PUBG/BGMI ID is already in use.');
-    }),
-    body('pubgName', 'Enter your PUBG/BGMI name').isLength({ min: 1, max: 30 }).custom(async (pubgName) => {
-
-        // find any user with the given name
-        if (await User.findOne({ pubgName })) throw new Error('PUBG/BGMI name is already in use');
-    }),
-    body('fullName', 'Enter a valid full name').isLength({ min: 3, max: 25 }),
-
-    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }).custom(async (email) => {
-
-        // find any user with the given email
-        if (await User.findOne({ email })) throw new Error('Email already in use');
-    }),
-    body('mobileNumber', 'Enter a valid mobile number').isNumeric().isLength({ min: 10, max: 10 }).custom(async (mobileNumber) => {
-        if (await User.findOne({ mobileNumber })) throw new Error('Mobile number already in use');
-    }),
-    body('password', 'Enter a valid password').isAlphanumeric().isLength({ min: 6, max: 18 }),
-    body('gender', 'Enter gender initials').isAlpha().isLength({ min: 1, max: 1 }),
-    body('refCode', 'Enter refral code (not required)').isLength({ max: 50 }),
-
+    /* If you want to add some more fields to validate
+    then add those fields in "_validateMoreFields" or in "_validateBaseFields".  */
 ];
 
 // A validation array to validate user input field for login
@@ -39,21 +36,6 @@ exports.validateLoginField = [
 ];
 
 // A validation array to validate user input field to update details
-exports.validateUpdationField = [
-
-    body('pubgName', 'Enter your PUBG/BGMI name').optional().isLength({ min: 1, max: 30 }).custom(async (pubgName) => {
-
-        // find any user with the given name
-        if (await User.findOne({ pubgName })) throw new Error('PUBG/BGMI name is already in use');
-    }),
-    body('fullName', 'Enter a valid full name').optional().isLength({ min: 3, max: 25 }),
-    body('email', 'Enter a valid Email').optional().isEmail().isLength({ max: 50 }).custom(async (email) => {
-
-        // find any user with the given email
-        if (await User.findOne({ email })) throw new Error('Email already in use');
-    }),
-    body('mobileNumber', 'Enter a valid mobile number').optional().isNumeric().isLength({ min: 10, max: 10 }).custom(async (mobileNumber) => {
-        if (await User.findOne({ mobileNumber })) throw new Error('Mobile number already in use');
-    }),
-    body('gender', 'Enter gender initials').optional().isAlpha().isLength({ min: 1, max: 1 }),
-];
+exports.validateUpdationField = _validateBaseFields.map((validationRule) => {  // adding optional attributes to all fields for updation
+    return validationRule.optional();
+});
