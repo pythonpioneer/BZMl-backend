@@ -12,7 +12,6 @@ const _validateBaseFields = [  // do not export this field
     body('gender', 'Enter gender initials').isAlpha().isLength({ min: 1, max: 1 }),
 ];
 
-
 // A validation array to validate user input field for registration
 exports.validateRegistrationField = [
 
