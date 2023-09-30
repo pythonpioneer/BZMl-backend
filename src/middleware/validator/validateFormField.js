@@ -1,5 +1,5 @@
+// importing all requirements
 const { body, validationResult } = require('express-validator');
-const User = require('../../models/user/User');
 const { findRecord } = require('../../helper/utility/findDb');
 
 
