@@ -187,7 +187,11 @@ const deleteGame = async (req, res) => {
     }
 };
 
+// to update a game
+const updateGame = async (req, res) => {
+    
+};
 
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame };
+module.exports = { createGame, getGames, deleteGame, updateGame };
 
