@@ -5,7 +5,7 @@ const { findRecord } = require('../../helper/utility/findDb');
 
 // validate basic fields, which get duplicated in validateRetistration fields and in validateUpdation fields
 const _validateBaseFields = [  // add fields that can be updated only
-    body('pubgName', 'Enter your PUBG/BGMI name').isLength({ min: 1, max: 30 }).custom(async (pubgName) => await findRecord('User', { pubgName })),  // using find record method to find the data in the given database.
+    body('pubgName', 'Enter your PUBG/BGMI name').isLength({ max: 30 }).custom(async (pubgName) => await findRecord('User', { pubgName })),  // using find record method to find the data in the given database.
     body('fullName', 'Enter a valid full name').isLength({ min: 3, max: 25 }),
     body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }).custom(async (email) => await findRecord('User', { email })),
     body('mobileNumber', 'Enter a valid mobile number').isNumeric().isLength({ min: 10, max: 10 }).custom(async (mobileNumber) => await findRecord('User', { mobileNumber })),
