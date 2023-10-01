@@ -189,7 +189,62 @@ const deleteGame = async (req, res) => {
 
 // to update a game
 const updateGame = async (req, res) => {
-    
+    try {
+        // fetch all the values from request body
+        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, entryFee } = req.body;
+        let toBeUpdated = false;  // if any field given to update
+
+        // now, create a new game object
+        let newGame = { timeStamp: Date.now() };
+
+        // now, find and fill all the field to be updated
+        if (gamingPlatform) {
+            toBeUpdated = true;
+            newGame.gamingPlatform = gamingPlatform;
+        }
+        if (gamingMode) {
+            toBeUpdated = true;
+            newGame.gamingMode = gamingMode;
+        }
+        if (roomId) {
+            toBeUpdated = true;
+            newGame.roomId = roomId;
+        }
+        if (roomPass) {
+            toBeUpdated = true;
+            newGame.roomPass = roomPass;
+        }
+        if (prizePool) {
+            toBeUpdated = true;
+            newGame.prizePool = true;
+        }
+
+        // now confirm that the game is to be updated
+        if (toBeUpdated) {
+
+            // fetch the game ID from the query
+            const gameId = req.query['game-id'];
+            if (!gameId) return res.status(404).json({ status: 404, message: "game not found" });
+
+            // now confirm that the game exists
+            let game = await Game.findById(gameId);
+            if (!game) return res.status(404).json({ status: 404, message: "game not found" });
+
+            // confirm that the user is logged in as admin
+            let admin = await Admin.findById(req.user.id);
+            if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+            // then update the game
+            game = await Game.findByIdAndUpdate(gameId, { $set: newGame }, { new: true });
+            return res.status(200).json({ status: 200, message: 'game updated', user: game });
+        }
+
+        // this will not send any json as response because status: 204
+        else res.status(204).json({status: 204, message: "Nothing is there to be updated"});
+
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
 };
 
 // exporting required methods

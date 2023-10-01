@@ -8,7 +8,6 @@ const _gameFields = [
     }),
     body('gamingMode').custom(value => ['solo', 'duo', 'squad'].includes(value?.toLowerCase())).isLength({ min: 3 }).withMessage('Enter a valid mode (solo | duo | squad)'),
     body('prizePool', 'Enter valid prize pool (Numeric)').isNumeric(),
-    body('entryFee', 'Enter valid entry fee (Numeric)').isNumeric(),
 ];
 
 // validate the game fields to create game 
