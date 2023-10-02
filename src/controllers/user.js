@@ -17,13 +17,16 @@ const createUser = async (req, res) => {
     let cash = 0;
 
     // find the ref-id
-    if (req.body?.refCode) {
-        let refUser = await User.findOne({ email: req.body.refCode });
+    if (req?.body?.refCode) {
+        let refUser = await User.findOne({ myRefCode: req.body.refCode });
         
-        // if reffered user exist then
-        refUser.myCash += 50;
-        cash = 50;
-        refUser.save();
+        // if user will be there then update
+        if (refUser) {
+            // if reffered user exist then
+            refUser.myCash += 50;
+            cash = 50;
+            refUser.save();
+        }
     }
 
     // create the user in db
@@ -35,7 +38,6 @@ const createUser = async (req, res) => {
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
-        refCode: req.body.refCode ? req.body.refCode : null,
         isVerified: false,
         myCash: cash,
     })
