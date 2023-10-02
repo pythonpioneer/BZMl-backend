@@ -1,5 +1,6 @@
 // importing all requirements
 const User = require('../models/user/User');
+const Player = require('../models/players/Player');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
@@ -12,14 +13,14 @@ const createUser = async (req, res) => {
     const securePassword = generatePassword(req.body.password);
     let gender = req.body.gender;
     gender = gender.toUpperCase();
-    
+
     // fields to update user data
     let cash = 0;
 
     // find the ref-id
     if (req?.body?.refCode) {
         let refUser = await User.findOne({ myRefCode: req.body.refCode });
-        
+
         // if user will be there then update
         if (refUser) {
             // if reffered user exist then
@@ -41,19 +42,30 @@ const createUser = async (req, res) => {
         isVerified: false,
         myCash: cash,
     })
-        .then( async (user) => {  // sending response, when user is created
+        .then(async (user) => {  // sending response, when user is created
 
-            // sending user id as payload, because accesssing data using id is easier
-            const payloadData = {
-                user: {
-                    id: user.id
-                },
-            };
+            // now, create a player
+            Player.create({
+                pubgID: user.pubgID,
+                pubgName: user.pubgName,
+            })
+                .then(player => {
+                    // sending user id as payload, because accesssing data using id is easier
+                    const payloadData = {
+                        user: {
+                            id: user.id
+                        },
+                    };
 
-            // generating authToken when user created
-            const authToken = generateToken(payloadData);
-            return res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
-        })
+                    // generating authToken when user created
+                    const authToken = generateToken(payloadData);
+                    return res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
+                })
+                .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
+                    errors: "Internal server error",
+                    issue: err
+                }));
+            })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
@@ -149,7 +161,7 @@ const setUserDetails = async (req, res) => {
             updatedUser.gender = gender;
         }
 
-        if(toBeUpdated){
+        if (toBeUpdated) {
             // now find the user that to be updated and confirm that the user exists
             let user = await User.findById(req.user.id);
             if (!user) res.status(404).json({ status: 404, message: "User Not Found" });
@@ -159,9 +171,9 @@ const setUserDetails = async (req, res) => {
             res.status(200).json({ status: 200, message: 'user updated', user: user });
         }
         // this will not send any json as response because status: 204
-        else res.status(204).json({status: 204, message: "Nothing is there to be updated"});
+        else res.status(204).json({ status: 204, message: "Nothing is there to be updated" });
 
-    } catch (err) { 
+    } catch (err) {
         res.status(500).json({ errors: "Internal server error", issue: err });
     }
 
@@ -170,10 +182,10 @@ const setUserDetails = async (req, res) => {
 // to delete the user account
 const deleteUserAccount = async (req, res) => {
 
-    try{  // find the user that to be deleted
+    try {  // find the user that to be deleted
         // and confirms the user identity
         let user = await User.findById(req.user.id);
-        if(!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
 
 
         // if not admin then delete (issue-12)
@@ -182,7 +194,7 @@ const deleteUserAccount = async (req, res) => {
         user = await User.findByIdAndDelete(req.user.id);
         return res.status(200).json({ status: 200, message: 'user deleted', user: user });
 
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
