@@ -52,6 +52,22 @@ const userSchema = new Schema({
         type: Number,
         default: 0,
     },
+    totalInvestments: {
+        type: Number,
+        default: 0,
+    },
+    cashEarned: {
+        type: Number,
+        default: 0,
+    },
+    myRefCode: {
+        type: String,
+        default: null,
+    },
+    isMoneyRequested: {
+        type: Boolean,
+        default: false,
+    },
     timestamp: {
         type: Date,
         default: Date.now,
