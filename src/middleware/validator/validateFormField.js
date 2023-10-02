@@ -39,3 +39,13 @@ exports.validateLoginField = [
 exports.validateUpdationField = _validateBaseFields.map((validationRule) => {  // adding optional attributes to all fields for updation
     return validationRule.optional();
 });
+
+// validating referral code 
+exports.validateRefCode = [
+    body('myRefCode')
+        .isLength({ min: 1, max: 30})
+        .isAlphanumeric()
+        .custom(value => !/\s/.test(value))
+        .withMessage('Enter a valid ref code (without spaces)')
+        .custom(async (myRefCode) => await findRecord('User', { myRefCode })),
+];

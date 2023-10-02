@@ -36,9 +36,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    refCode: {
-        type: String,
-    },
     isVerified: {
         type: Boolean,
         default: false,
@@ -63,6 +60,7 @@ const userSchema = new Schema({
     myRefCode: {
         type: String,
         default: null,
+        unique: true,
     },
     isMoneyRequested: {
         type: Boolean,

@@ -17,13 +17,16 @@ const createUser = async (req, res) => {
     let cash = 0;
 
     // find the ref-id
-    if (req.body?.refCode) {
-        let refUser = await User.findOne({ email: req.body.refCode });
+    if (req?.body?.refCode) {
+        let refUser = await User.findOne({ myRefCode: req.body.refCode });
         
-        // if reffered user exist then
-        refUser.myCash += 50;
-        cash = 50;
-        refUser.save();
+        // if user will be there then update
+        if (refUser) {
+            // if reffered user exist then
+            refUser.myCash += 50;
+            cash = 50;
+            refUser.save();
+        }
     }
 
     // create the user in db
@@ -35,7 +38,6 @@ const createUser = async (req, res) => {
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
-        refCode: req.body.refCode ? req.body.refCode : null,
         isVerified: false,
         myCash: cash,
     })
@@ -185,4 +187,23 @@ const deleteUserAccount = async (req, res) => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount };
+// to generate or update the referral code
+const generateRef = async (req, res) => {
+    try {
+        // fetch the referral code from the body
+        const { myRefCode } = req.body;
+
+        // now confirm that the user is logged in and exists
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now update the refCode
+        user = await User.findByIdAndUpdate(req.user.id, { $set: { myRefCode } }, { new: true });
+        return res.status(200).json({ status: 200, message: "Referral code updated", user: user });
+
+    } catch (err) {
+        res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef };

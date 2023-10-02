@@ -1,8 +1,8 @@
 // importing requirements
 const express = require('express');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
-const { getUserDetails, setUserDetails, deleteUserAccount } = require('../controllers/user');
-const { validateUpdationField } = require('../middleware/validator/validateFormField');
+const { getUserDetails, setUserDetails, deleteUserAccount, generateRef } = require('../controllers/user');
+const { validateUpdationField, validateRefCode } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = express.Router();
 
@@ -14,6 +14,9 @@ router.put('/user', validateUpdationField, validateValidationResult, fetchUser, 
 
 // Route 5: To delete a logged in user account: '/bzml/api/v1/user/delete-user' [using DELETE] (login required)
 router.delete('/delete-user', fetchUser, deleteUserAccount);
+
+// Route 6: To generate/update refCode of logged in user: '/bzml/api/v1/user/refcode' [using PUT] (login required)
+router.put('/refcode', validateRefCode, validateValidationResult, fetchUser, generateRef);
 
 // export router
 module.exports = router;
