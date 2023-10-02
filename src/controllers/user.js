@@ -195,10 +195,6 @@ const generateRef = async (req, res) => {
         let user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
 
-        // now, find that the given refCode is not in used
-        let refCode = await User.findOne({ myRefCode });
-        if (refCode) return res.status(400).json({ status: 400, message: "Referral code is already in use" });
-
         // now update the refCode
         user = await User.findByIdAndUpdate(req.user.id, { $set: { myRefCode } }, { new: true });
         return res.status(200).json({ status: 200, message: "Referral code updated", user: user });

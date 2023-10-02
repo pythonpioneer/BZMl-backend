@@ -47,4 +47,5 @@ exports.validateRefCode = [
         .isAlphanumeric()
         .custom(value => !/\s/.test(value))
         .withMessage('Enter a valid ref code (without spaces)')
+        .custom(async (myRefCode) => await findRecord('User', { myRefCode })),
 ];
