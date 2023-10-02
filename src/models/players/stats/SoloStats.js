@@ -4,30 +4,38 @@ const { Schema } = mongoose;
 
 // creating schema for users
 const soloStatsSchema = new Schema({
-    user : {  // used as primary key and forgein key
-        type: mongoose.Schema.Types.ObjectId,  
+    pubgID: {  // the game id entered by the user (used and forgein key)
+        type: String,
+        required: true,
+        unique: true,
     },
-    matchPlayed: {
+    soloTotalMatch: {  // total matches played by player, in solo mode
         type: Number,
+        default: 0,
         required: true,
     },
-    matchWon: {
+    soloTotalWins: {  // total matches won by player, in solo mode
         type: Number,
+        default: 0,
         required: true,
     },
-    totalFinishes: {
+    soloTotalFinish: {  // total finishes by player
         type: Number,
+        default: 0,
         required: true,
     },
-    top5: {
+    soloTopFive: {
         type: Number,
+        default: 0,
         required: true,
     },
-    mostFinishes: {
+    soloMostFinish: {
         type: Number,
+        default: 0,
         required: true,
     }
 });
 
+// export the model
 const SoloStats = mongoose.model('SoloStats', soloStatsSchema);
 module.exports = SoloStats;
