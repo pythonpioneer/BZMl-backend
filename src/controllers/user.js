@@ -185,4 +185,9 @@ const deleteUserAccount = async (req, res) => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount };
+// to generate or update the referral code
+const generateRef = async (req, res) => {
+    res.send("ok");
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef };
