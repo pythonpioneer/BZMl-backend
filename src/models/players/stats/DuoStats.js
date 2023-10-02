@@ -24,16 +24,35 @@ const duoStatsSchema = new Schema({
         default: 0,
         required: true,
     },
-    duoTopThree: {
+    duoTopThree: {  // rank obtained by player in match
         type: Number,
         default: 0,
         required: true,
     },
-    duoMostFinish: {
+    duoMostFinish: {  // max kill in a match
         type: Number,
         default: 0,
         required: true,
-    }, // add more fields and verify upper fields plz
+    },
+    duoTeamMostFinish: {  // max kill by a team in a match
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    duoTeamTotalFinish: {  // total kill by the team
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    duoDomination: {  // obtained by a formula and it represents the performance of the player w.r.t team.
+        type: Number,
+        default: 0,
+        required: true,
+    },
+    duoMaxPlayerAllowed: {  // total player allowed in a team
+        type: Number,
+        default: 2,
+    }
 });
 
 // export the model
