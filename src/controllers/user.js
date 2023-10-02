@@ -1,5 +1,6 @@
 // importing all requirements
 const User = require('../models/user/User');
+const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
@@ -86,6 +87,10 @@ const loginUser = async (req, res) => {
         if (isNumber(userfield))
             user = await User.findOne({ mobileNumber: userfield });  // login with mobile no.
         else user = await User.findOne({ email: userfield });  // login with email
+
+        // check that the user is ban or not
+        let banUser = await Ban.findOne({ PubgId: user.pubgID });
+        if (banUser) return res.status(401).json({ status: 401, message: "You are banned, can't login!!" });
 
         // if user doesn't exist or wrong input fields
         if (!user) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
