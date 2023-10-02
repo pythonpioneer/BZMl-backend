@@ -187,7 +187,25 @@ const deleteUserAccount = async (req, res) => {
 
 // to generate or update the referral code
 const generateRef = async (req, res) => {
-    res.send("ok");
+    try {
+        // fetch the referral code from the body
+        const { myRefCode } = req.body;
+
+        // now confirm that the user is logged in and exists
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now, find that the given refCode is not in used
+        let refCode = await User.findOne({ myRefCode });
+        if (refCode) return res.status(400).json({ status: 400, message: "Referral code already is in use" });
+
+        // now update the refCode
+        user = await User.findByIdAndUpdate(req.user.id, { $set: { myRefCode } }, { new: true });
+        return res.status(200).json({ status: 200, message: "Referral code updated", user: user });
+
+    } catch (err) {
+        res.status(500).json({ errors: "Internal server error", issue: err });
+    }
 };
 
 module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef };
