@@ -89,7 +89,7 @@ const loginUser = async (req, res) => {
         else user = await User.findOne({ email: userfield });  // login with email
 
         // check that the user is ban or not
-        let banUser = await Ban.findOne({ PubgId: user.pubgID });
+        let banUser = await Ban.findOne({ pubgID: user.pubgID });
         if (banUser) return res.status(401).json({ status: 401, message: "You are banned, can't login!!" });
 
         // if user doesn't exist or wrong input fields
