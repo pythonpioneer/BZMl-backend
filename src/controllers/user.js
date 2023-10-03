@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
 
     // find the ref-id
     if (req?.body?.refCode) {
-        let refUser = await User.findOne({ myRefCode: req.body.refCode });
+        let refUser = await User.findOne({ myRefCode: req?.body?.refCode });
 
         // if user will be there then update
         if (refUser) {
@@ -40,8 +40,8 @@ const createUser = async (req, res) => {
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
-        isVerified: false,
         myCash: cash,
+        myRefCode: req.body.mobileNumber,
     })
         .then(async (user) => {  // sending response, when user is created
 
@@ -89,7 +89,7 @@ const loginUser = async (req, res) => {
         else user = await User.findOne({ email: userfield });  // login with email
 
         // check that the user is ban or not
-        let banUser = await Ban.findOne({ PubgId: user.pubgID });
+        let banUser = await Ban.findOne({ pubgID: user.pubgID });
         if (banUser) return res.status(401).json({ status: 401, message: "You are banned, can't login!!" });
 
         // if user doesn't exist or wrong input fields
