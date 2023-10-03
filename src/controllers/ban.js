@@ -4,32 +4,28 @@ const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const { comparePassword } = require('../middleware/auth/passwordMiddleware');
-const { updateOne } = require('../models/players/Player');
 
 
 // To ban a user/player
 const banPlayer = async (req, res) => {
     try {
         // fetch the password and user-id from the request
-        const { password } = req.body;
-        const userId = req.query['user-id'];
-
-        if (!userId) return res.status(404).json({ status: 404, message: "user id query not found"});
+        const { pubgID, password } = req.body;  // it's confirm that the user exist, from vaidation array
 
         // now check that admin is logged in
         let admin = await Admin.findById(req.user.id);
         if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
 
-        // now, cofirm that the given user exists
-        let user = await User.findById(userId);
-        if (!user) return res.status(404).json({ status: 404, message: "user not found"});
-
         // now, match the admin password
         if (!comparePassword(password, admin.password))
             return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Invalid Credentials" });
 
+        // confirm that the given user exists
+        let user = await User.findOne({ pubgID });
+        if (!user) return res.status(404).json({ "status": 404, "message": "User Not Found" });
+
         // now, check that the user is already ban or not
-        let banUser = await Ban.findOne({ email: user.email });  // finding user using email
+        let banUser = await Ban.findOne({ pubgID });  // finding user pubgID
         if (banUser) return res.status(400).json({ status: 400, message: "User/Player is already banned!!"});
 
         // now ban the user by adding the user details into Ban model
