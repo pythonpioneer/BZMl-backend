@@ -20,10 +20,10 @@ const createUser = async (req, res) => {
 
     // find the ref-id
     if (req?.body?.refCode) {
-        let refUser = await User.findOne({ myRefCode: req.body.refCode });
+        let refUser = await User.find({ myRefCode: req?.body?.refCode });
 
         // if user will be there then update
-        if (refUser) {
+        if (refUser.length > 0) {
             // if reffered user exist then
             refUser.myCash += 50;
             cash = 50;
@@ -40,8 +40,8 @@ const createUser = async (req, res) => {
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
-        isVerified: false,
         myCash: cash,
+        myRefCode: req.body.mobileNumber,
     })
         .then(async (user) => {  // sending response, when user is created
 

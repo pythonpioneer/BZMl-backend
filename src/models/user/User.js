@@ -59,7 +59,6 @@ const userSchema = new Schema({
     },
     myRefCode: {
         type: String,
-        default: null,
         unique: true,
     },
     isMoneyRequested: {
