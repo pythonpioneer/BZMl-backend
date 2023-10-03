@@ -14,6 +14,8 @@ const banPlayer = async (req, res) => {
         const { password } = req.body;
         const userId = req.query['user-id'];
 
+        if (!userId) return res.status(404).json({ status: 404, message: "user id query not found"});
+
         // now check that admin is logged in
         let admin = await Admin.findById(req.user.id);
         if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
@@ -25,6 +27,10 @@ const banPlayer = async (req, res) => {
         // now, match the admin password
         if (!comparePassword(password, admin.password))
             return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Invalid Credentials" });
+
+        // now, check that the user is already ban or not
+        let banUser = await Ban.findOne({ email: user.email });  // finding user using email
+        if (banUser) return res.status(400).json({ status: 400, message: "User/Player is already banned!!"});
 
         // now ban the user by adding the user details into Ban model
         Ban.create({
