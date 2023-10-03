@@ -58,5 +58,10 @@ const banPlayer = async (req, res) => {
     }
 };
 
+// to get all the ban player list (admin only)
+const getBanPlayers = async (req, res) => {
+    res.send("ok");
+};
+
 // export all required methods
-module.exports = { banPlayer };
+module.exports = { banPlayer, getBanPlayers };
