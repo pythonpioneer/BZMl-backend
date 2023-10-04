@@ -124,7 +124,12 @@ const getUserDetails = async (req, res) => {
     try {  // find user by id
         const user = await User.findById(req.user.id)
             .select('-password');  // not fetch password from db
-        res.status(200).json({ "status": 200, "message": "User Found", "data": user });
+
+        // if user is not in db
+        if (!user) return res.status(404).json({ "status": 404, "message": "User Not Found" });
+
+        // else return the user
+        return res.status(200).json({ "status": 200, "message": "User Found", "data": user });
     } catch (err) {
         res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
