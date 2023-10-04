@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer } = require('../controllers/ban');
+const { banPlayer, getBanPlayers } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
@@ -15,6 +15,9 @@ router.post('/ban-player', [
     fetchUser,
     banPlayer
 );
+
+// Route 2: To get all ban user list (admin access only): '/bzml/api/v1/ban/get-ban-player' [using GET] (login required)
+router.get('/get-ban-player', fetchUser, getBanPlayers);
 
 // export the router
 module.exports = router;
