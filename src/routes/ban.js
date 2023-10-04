@@ -2,15 +2,14 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer } = require('../controllers/ban');
+const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
+const { validateBanFields } = require('../middleware/validator/ban/validateBanFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
 // Route 1: To ban a user (admin access only): '/bzml/api/v1/ban/ban-player' [using POST] (login required)
-router.post('/ban-player', [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-    body('password', "Enter a valid password (admin)").isAlphanumeric().isLength({ min: 6, max: 18 })
-],
+router.post('/ban-player', 
+    validateBanFields,
     validateValidationResult,
     fetchUser,
     banPlayer
@@ -20,24 +19,23 @@ router.post('/ban-player', [
 router.get('/get-ban-player', fetchUser, getBanPlayers);
 
 // Route 3: To unban the user (admin access only): '/bzml/api/v1/ban/unban-player' [using DELETE] (login required)
-router.delete('/unban-player', [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-    body('password', "Enter a valid password (admin)").isAlphanumeric().isLength({ min: 6, max: 18 })
-], 
+router.delete('/unban-player', 
+    validateBanFields,
     validateValidationResult, 
     fetchUser, 
     unbanPlayer
 );
 
 // Route 4: To block the player (admin access only): '/bzml/api/v1/ban/block-player' [using PATCH] (login required)
-router.patch('/block-player', [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-    body('password', "Enter a valid password (admin)").isAlphanumeric().isLength({ min: 6, max: 18 })
-],
+router.patch('/block-player', 
+    validateBanFields,
     validateValidationResult,
     fetchUser,
     blockPlayer
 );
+
+// Route 5: To get all the block player list (admin access only): '/bzml/api/v1/ban/get-block-player' [using GET] (login required)
+router.get('/get-block-player', fetchUser, getBlockPlayers);
 
 // export the router
 module.exports = router;
