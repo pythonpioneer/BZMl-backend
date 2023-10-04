@@ -120,5 +120,48 @@ const unbanPlayer = async (req, res) => {
     }
 };
 
+// to block the player
+const blockPlayer = async (req, res) => {
+    try {
+        // fetch the id and password from the body
+        const { pubgID, password } = req.body;
+
+        // confirm that the request is made by the admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, match the password of the admin
+        if (!comparePassword(password, admin.password))
+            return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Invalid Credentials" });
+
+        // find that the user exists
+        let user = await User.findOne({ pubgID });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // confirm that the player exists
+        let player = await Player.findOne({ pubgID });
+        if (player) { 
+
+            // check that the player is already blocked
+            if (player.isBlocked) {
+                return res.status(400).json({ status: 400, messge: "Player is already blocked" });
+            }
+
+            // now, change the block status of the player
+            player.isBlocked = true;
+            player.save();
+
+            // player is blocked now
+            return res.status(200).json({ status: 200, messge: "Player is blocked, now!!", player: player });
+        } 
+
+        // if player not found
+        else return res.status(404).json({ status: 404, message: "Player Not Found" });
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // export all required methods
-module.exports = { banPlayer, getBanPlayers, unbanPlayer };
+module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer };

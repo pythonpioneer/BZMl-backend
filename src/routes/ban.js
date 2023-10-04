@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer, getBanPlayers, unbanPlayer } = require('../controllers/ban');
+const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
@@ -27,6 +27,16 @@ router.delete('/unban-player', [
     validateValidationResult, 
     fetchUser, 
     unbanPlayer
+);
+
+// Route 4: To block the player (admin access only): '/bzml/api/v1/ban/block-player' [using PATCH] (login required)
+router.patch('/block-player', [
+    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
+    body('password', "Enter a valid password (admin)").isAlphanumeric().isLength({ min: 6, max: 18 })
+],
+    validateValidationResult,
+    fetchUser,
+    blockPlayer
 );
 
 // export the router
