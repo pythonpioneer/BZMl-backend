@@ -183,5 +183,47 @@ const getBlockPlayers = async (req, res) => {
     }
 };
 
+// to unblock the player
+const unblockPlayer = async (req, res) => {
+    try {
+        // fetch the id and password from the body
+        const { pubgID, password } = req.body;
+
+        // confirm that the request is made by the admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, match the password of the admin
+        if (!comparePassword(password, admin.password))
+            return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Invalid Credentials" });
+
+        // check that the user exists with the given id
+        let user = await User.findOne({ pubgID });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now, confirm that the player exist with the given id
+        let player = await Player.findOne({ pubgID });
+        if (player) { 
+
+            if (!player.isBlocked) {  // player is already unblocked
+                return res.status(400).json({ status: 400, message: "Player is already unblocked!" });
+            }
+
+            // now change the player block status
+            player.isBlocked = false;
+            player.save();
+
+            // player is unblocked now
+            return res.status(200).json({ status: 200, messge: "Player is unblocked, now!!", player: player });
+        }
+
+        // player doesn't exists
+        return res.status(404).json({ status: 404, message: "Player Not Found" });
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // export all required methods
-module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers };
+module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers, unblockPlayer };
