@@ -4,6 +4,7 @@ const { generatePassword, comparePassword } = require('../middleware/auth/passwo
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const User = require('../models/user/User');
+const Player = require('../models/players/Player');
 
 // to create admins
 const createAdmin = async (req, res) => {
@@ -146,13 +147,13 @@ const getAllAdmins = async (req, res) => {
 
 // to delete any users
 const deleteAnyUser = async (req, res) => {
-    try { 
+    try {
 
         const userId = req.query['user-id'];
 
         // confirm that the given user exists
         let user = await User.findById(userId);
-        if (!user) return res.status(404).json({ status: 404, message: "user not found"});
+        if (!user) return res.status(404).json({ status: 404, message: "user not found" });
 
         // now, confirm the admin identity
         let admin = await Admin.findById(req.user.id);
@@ -172,14 +173,14 @@ const deleteAnyUser = async (req, res) => {
 
 // to delete any admin
 const deleteAnyAdmin = async (req, res) => {
-    try {  
+    try {
         // fetch the id and the password from the query and body
         const adminId = req.query['admin-id'];
         const password = req?.body?.password;
 
         // confirm that the given admin exists
         let admin = await Admin.findById(adminId);
-        if (!admin) return res.status(404).json({ status: 404, message: "admin not found"});
+        if (!admin) return res.status(404).json({ status: 404, message: "admin not found" });
 
         // now, match the password of the curr admin
         let currAdmin = await Admin.findById(req.user.id);
@@ -198,7 +199,7 @@ const deleteAnyAdmin = async (req, res) => {
     }
 };
 
-// to get a user details
+// to get the user details
 const getTheUser = async (req, res) => {
     try {
         // fetch the user id from the body
@@ -214,11 +215,37 @@ const getTheUser = async (req, res) => {
 
         // now return the user info
         return res.status(200).json({ status: 200, message: "User found", user: user });
- 
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+// to get the player details
+const getThePlayer = async (req, res) => {
+    try {
+        // fetch the user id from the body
+        const { pubgID } = req.body;
+
+        // now confirm that the request is made by the admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now check that the user exists
+        let user = await User.findOne({ pubgID });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now, get the player exists
+        let player = await Player.findOne({ pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "Player Not Found" });
+
+        // now, return the player
+        return res.status(200).json({ status: 200, message: "Player Found!!", player: player });
+
     } catch (err) {  // unrecogonized errors
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
 
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer };
