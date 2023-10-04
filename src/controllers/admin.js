@@ -200,7 +200,24 @@ const deleteAnyAdmin = async (req, res) => {
 
 // to get a user details
 const getTheUser = async (req, res) => {
-    res.send("ok")
+    try {
+        // fetch the user id from the body
+        const { pubgID } = req.body;
+
+        // now confirm that the request is made by the admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now check that the user exist and fetch the user data without password
+        let user = await User.findOne({ pubgID }).select('-password');
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now return the user info
+        return res.status(200).json({ status: 200, message: "User found", user: user });
+ 
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
 };
 
 // export all controller functions
