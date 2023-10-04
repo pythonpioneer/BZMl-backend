@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer } = require('../controllers/ban');
+const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateBanFields } = require('../middleware/validator/ban/validateBanFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -33,6 +33,9 @@ router.patch('/block-player',
     fetchUser,
     blockPlayer
 );
+
+// Route 5: To get all the block player list (admin access only): '/bzml/api/v1/ban/get-block-player' [using GET] (login required)
+router.get('/get-block-player', fetchUser, getBlockPlayers);
 
 // export the router
 module.exports = router;

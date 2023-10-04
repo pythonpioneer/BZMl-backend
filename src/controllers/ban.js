@@ -163,5 +163,25 @@ const blockPlayer = async (req, res) => {
     }
 };
 
+// to get the list of all block players
+const getBlockPlayers = async (req, res) => {
+    try {
+        // validate that the request is made by the admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, get the list of all blcok players.
+        const blockPlayers = await Player.find({ "isBlocked": true });
+
+        if (blockPlayers.length > 0) {  // if there is block players
+            return res.status(200).json({ status: 200, message: "Block players found!", blockPlayers: blockPlayers });
+        }
+        return res.status(200).json({ status: 200, message: "No block player found!" });
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // export all required methods
-module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer };
+module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers };
