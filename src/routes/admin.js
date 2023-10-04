@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -57,6 +57,15 @@ router.delete('/delete-the-admin', [
     validateValidationResult,
     fetchUser,
     deleteAnyAdmin
+);
+
+// Route 9: To get the user by user id (only admin access): '/bzml/api/v1/admin/get-the-user' [using GET] (login required)
+router.get('/get-the-user', [
+    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
+],
+    validateValidationResult,
+    fetchUser,
+    getTheUser
 );
 
 // export the router
