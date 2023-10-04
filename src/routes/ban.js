@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer, getBanPlayers } = require('../controllers/ban');
+const { banPlayer, getBanPlayers, unbanPlayer } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 
@@ -18,6 +18,16 @@ router.post('/ban-player', [
 
 // Route 2: To get all ban user list (admin access only): '/bzml/api/v1/ban/get-ban-player' [using GET] (login required)
 router.get('/get-ban-player', fetchUser, getBanPlayers);
+
+// Route 3: To unban the user (admin access only): '/bzml/api/v1/ban/unban-player' [using DELETE] (login required)
+router.delete('/unban-player', [
+    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
+    body('password', "Enter a valid password (admin)").isAlphanumeric().isLength({ min: 6, max: 18 })
+], 
+    validateValidationResult, 
+    fetchUser, 
+    unbanPlayer
+);
 
 // export the router
 module.exports = router;

@@ -74,5 +74,51 @@ const getBanPlayers = async (req, res) => {
     }
 };
 
+// to unban the user
+const unbanPlayer = async (req, res) => {
+    try {  // fetch the id and password from the body
+        const { pubgID, password } = req.body;
+
+        // confirm that the request is made by admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // match the password of the admin
+        if (!comparePassword(password, admin.password))
+            return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Invalid Credentials" });
+
+        // now, find that the given user exists
+        let user = await User.findOne({ pubgID });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now, check that the player exists
+        let player = await Player.findOne({ pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "Player Not Found" });
+
+        // now check that the ban player exists
+        let banPlayer = await Ban.findOne({ pubgID });
+        if (!banPlayer) return res.status(404).json({ status: 400, message: "User is not banned" });
+
+        // now, delete the ban player from the ban model
+        banPlayer = await Ban.findByIdAndDelete(banPlayer._id);
+        if (banPlayer) {  // user deleted from the ban player model
+            
+            if (player.isBan) {  // if the ban status of player is true
+                player.isBan = false;
+                player.save();
+            }
+
+            // user, is successfully unbanned
+            return res.status(200).json({ status: 200, messge: "Player is unbanned, now!!", player: player });
+        }
+
+        // if the player is not in ban model
+        else return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // export all required methods
-module.exports = { banPlayer, getBanPlayers };
+module.exports = { banPlayer, getBanPlayers, unbanPlayer };
