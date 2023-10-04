@@ -183,5 +183,10 @@ const getBlockPlayers = async (req, res) => {
     }
 };
 
+// to unblock the player
+const unblockPlayer = async (req, res) => {
+    res.send("ok");
+};
+
 // export all required methods
-module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers };
+module.exports = { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers, unblockPlayer };

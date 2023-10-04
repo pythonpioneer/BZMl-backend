@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers } = require('../controllers/ban');
+const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers, unblockPlayer } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateBanFields } = require('../middleware/validator/ban/validateBanFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -36,6 +36,9 @@ router.patch('/block-player',
 
 // Route 5: To get all the block player list (admin access only): '/bzml/api/v1/ban/get-block-player' [using GET] (login required)
 router.get('/get-block-player', fetchUser, getBlockPlayers);
+
+// Route 3: To unblock the user (admin access only): '/bzml/api/v1/ban/unblock-player' [using PATCH] (login required)
+router.patch('unblock-player', fetchUser, unblockPlayer);
 
 // export the router
 module.exports = router;
