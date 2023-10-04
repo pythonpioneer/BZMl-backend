@@ -198,5 +198,10 @@ const deleteAnyAdmin = async (req, res) => {
     }
 };
 
+// to get a user details
+const getTheUser = async (req, res) => {
+    res.send("ok")
+};
+
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser };
