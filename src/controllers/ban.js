@@ -60,7 +60,18 @@ const banPlayer = async (req, res) => {
 
 // to get all the ban player list (admin only)
 const getBanPlayers = async (req, res) => {
-    res.send("ok");
+    try {  
+        // confirm that the request is made by admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now fetch all the ban player list
+        const banPlayers = await Ban.find();  // fetch all data form Ban model
+        return res.status(200).json({ status: 200, message: "Ban players found", players: banPlayers });
+
+    } catch (err) {
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
 };
 
 // export all required methods
