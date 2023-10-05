@@ -149,7 +149,7 @@ const setUserDetails = async (req, res) => {
         // now, fill all the updated details in the new user object
         if (pubgName) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isGameVerified = false;
             updatedUser.pubgName = pubgName;
         }
         if (fullName) {
@@ -158,12 +158,12 @@ const setUserDetails = async (req, res) => {
         }
         if (email) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isEmailVerified = false;
             updatedUser.email = email;
         }
         if (mobileNumber) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isMobileVerified = false;
             updatedUser.mobileNumber = mobileNumber;
         }
         if (gender) {
