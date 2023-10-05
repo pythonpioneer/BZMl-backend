@@ -12,7 +12,7 @@ connectToMongo();
 
 // development environment specifications
 const app = express()
-const PORT = process.env.PORT;
+const PORT = process.env.PORT  || 2100;
 const APIPATH = process.env.API_PATH;  // this can be any string, a starting path for the API
 
 // to use req.body, we have to use this middleware
