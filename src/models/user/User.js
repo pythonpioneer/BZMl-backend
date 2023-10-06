@@ -41,6 +41,21 @@ const userSchema = new Schema({
         default: false,
         required: true,
     },
+    isEmailVerified: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
+    isMobileVerified: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
+    isGameVerified: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
     country: {
         type: String,
         default: "India"

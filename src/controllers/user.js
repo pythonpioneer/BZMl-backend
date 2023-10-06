@@ -2,9 +2,12 @@
 const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
+const EmailVerification = require('../models/verfiy/VerifyEmail');
+const { sendMail, otpEmailTemplate } = require('../helper/utility/sendMail');
+const { generateOtp } = require('../helper/utility/generate');
+const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
-const { isNumber } = require('../helper/utility/fieldIdentifier');
 
 
 // to create user
@@ -58,15 +61,37 @@ const createUser = async (req, res) => {
                         },
                     };
 
-                    // generating authToken when user created
-                    const authToken = generateToken(payloadData);
-                    return res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
+                    // now generate an otp, save it and send it to user
+                    const otp = generateOtp();
+                    EmailVerification.create({
+                        email: user.email,
+                        otpEmail: otp,
+                    })
+                        .then((verify) => {
+
+                            let otpTemplate = otpEmailTemplate(user.fullName, otp);
+
+                            // now send the email to the user
+                            sendMail({
+                                to: verify.email,
+                                subject: "BZML Email Verification",
+                                html: otpTemplate
+                            });
+
+                            // user created successfully
+                            return res.status(200).json({ "status": 200, "message": "user created", "info": "Verify Your Email Address" });
+                        })
+                        .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
+                            errors: "Sending Email Failure!",
+                            issue: err
+                        }));
+
                 })
                 .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
                     errors: "Internal server error",
                     issue: err
                 }));
-            })
+        })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
@@ -107,14 +132,14 @@ const loginUser = async (req, res) => {
         };
 
         // generate auth-token send it
-        const authToken = generateToken(payloadData)
+        const authToken = generateToken(payloadData);
         res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken });
 
     } catch (err) {
         res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
             issue: err
-        })
+        });
     }
 };
 
@@ -149,7 +174,7 @@ const setUserDetails = async (req, res) => {
         // now, fill all the updated details in the new user object
         if (pubgName) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isGameVerified = false;
             updatedUser.pubgName = pubgName;
         }
         if (fullName) {
@@ -158,12 +183,12 @@ const setUserDetails = async (req, res) => {
         }
         if (email) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isEmailVerified = false;
             updatedUser.email = email;
         }
         if (mobileNumber) {
             toBeUpdated = true;
-            updatedUser.isVerified = false;
+            updatedUser.isMobileVerified = false;
             updatedUser.mobileNumber = mobileNumber;
         }
         if (gender) {
