@@ -2,10 +2,12 @@
 const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
+const EmailVerification = require('../models/verfiy/VerifyEmail');
+const { sendMail } = require('../helper/utility/sendMail');
+const { generateOtp } = require('../helper/utility/generate');
+const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
-const { isNumber } = require('../helper/utility/fieldIdentifier');
-const { sendMail } = require('../helper/utility/sendMail');
 
 
 // to create user
@@ -59,15 +61,37 @@ const createUser = async (req, res) => {
                         },
                     };
 
-                    // generating authToken when user created
-                    const authToken = generateToken(payloadData);
-                    return res.status(200).json({ "status": 200, "message": "user created", "auth-token": authToken });
+                    // now generate an otp, save it and send it to user
+                    const otp = generateOtp();
+                    EmailVerification.create({
+                        email: user.email,
+                        otpEmail: otp,
+                    })
+                        .then((verify) => {
+
+                            // now send the email to the user
+                            sendMail({
+                                to: verify.email,
+                                subject: "BZML Email Verification",
+                                html: `<h2>Hello, ${user.fullName}</h2>
+                                <p>This is your One Time Pin</p> <h3>${verify.otpEmail}</h3>`
+                            });
+
+                            // generating authToken when user created
+                            const authToken = generateToken(payloadData);
+                            return res.status(200).json({ "status": 200, "message": "user created", "info": "Verify Your Email Address", "auth-token": authToken });
+                        })
+                        .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
+                            errors: "Sending Email Failure!",
+                            issue: err
+                        }));
+
                 })
                 .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
                     errors: "Internal server error",
                     issue: err
                 }));
-            })
+        })
 
         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
