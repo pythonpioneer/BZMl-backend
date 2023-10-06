@@ -78,9 +78,8 @@ const createUser = async (req, res) => {
                                 html: otpTemplate
                             });
 
-                            // generating authToken when user created
-                            const authToken = generateToken(payloadData);
-                            return res.status(200).json({ "status": 200, "message": "user created", "info": "Verify Your Email Address", "auth-token": authToken });
+                            // user created successfully
+                            return res.status(200).json({ "status": 200, "message": "user created", "info": "Verify Your Email Address" });
                         })
                         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
                             errors: "Sending Email Failure!",
