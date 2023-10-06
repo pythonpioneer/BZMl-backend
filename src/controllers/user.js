@@ -140,7 +140,7 @@ const loginUser = async (req, res) => {
         res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
             issue: err
-        })
+        });
     }
 };
 
