@@ -1,26 +1,35 @@
 // importing requirements
 const nodemailer = require('nodemailer');
+require('dotenv').config();  // to access environment variables
 
-let transporter = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-      user: "7f0f23d6cdc9d2",
-      pass: "e2c26c364d5f5d"
-    }
-  });
 
-let mailOptions = {
-    from: 'kumarhritiksinha@gmail.com',
-    to: 'hritik.span@gmail.com',
-    subject: 'email setup',
-    text: 'Hi, this is the first email and goal is to verify email.'
+// create a method to send email
+exports.sendMail = (options) => {
+
+    // create a transporter
+    let transporter = nodemailer.createTransport({
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASS
+        }
+    });
+
+    // now, create a mail options to send the content
+    let mailOptions = {
+        from: process.env.MAIL_USER,
+        to: options.to,
+        subject: options.subject,
+        html: options.html
+    };
+
+    // now send the mail to the customer
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.log(err);  // if any error occured
+            return 400;
+        }
+        else return 200;  // if everything will be good
+    });
 };
-
-
-transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-        console.log(err);
-    }
-    else console.log("mail sent!!" + info);
-});
