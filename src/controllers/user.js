@@ -5,6 +5,7 @@ const Player = require('../models/players/Player');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
+const { sendMail } = require('../helper/utility/sendMail');
 
 
 // to create user
@@ -107,7 +108,7 @@ const loginUser = async (req, res) => {
         };
 
         // generate auth-token send it
-        const authToken = generateToken(payloadData)
+        const authToken = generateToken(payloadData);
         res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken });
 
     } catch (err) {
