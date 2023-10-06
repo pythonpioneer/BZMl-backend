@@ -3,7 +3,7 @@ const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
-const { sendMail } = require('../helper/utility/sendMail');
+const { sendMail, otpEmailTemplate } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
@@ -69,12 +69,13 @@ const createUser = async (req, res) => {
                     })
                         .then((verify) => {
 
+                            let otpTemplate = otpEmailTemplate(user.fullName, otp);
+
                             // now send the email to the user
                             sendMail({
                                 to: verify.email,
                                 subject: "BZML Email Verification",
-                                html: `<h2>Hello, ${user.fullName}</h2>
-                                <p>This is your One Time Pin</p> <h3>${verify.otpEmail}</h3>`
+                                html: otpTemplate
                             });
 
                             // generating authToken when user created
