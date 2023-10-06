@@ -15,7 +15,7 @@ const verifyEmail = async (req, res) => {
 
         // now, confirm that the user requested for OTP
         let pin = await EmailVerification.findOne({ email }); 
-        if (!pin) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
+        if (!pin) return res.status(404).json({ status: 404, message: "You need to Generate OTP" });
 
         // if otp is generated then match the otp 
         if (otp !== pin.otpEmail) return res.status(400).json({ status: 400, message: "Invalid OTP" });
