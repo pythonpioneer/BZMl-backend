@@ -10,7 +10,9 @@ const _validateOtp = [
     body('otp', 'Enter Valid OTP').isNumeric().isLength({ min: 6, max: 6 }),
 ];
 
-// Route 1: To verify user Email Address: '/bzml/api/v1/verify/email' [using POST] (login not required)
+// Route 1: To generate otp for email verification: '/bzml/api/v1/verify/generate-email-otp' [using POST] (login required) 
+
+// Route 2: To verify user Email Address: '/bzml/api/v1/verify/email' [using POST] (login not required)
 router.post('/email', _validateOtp, validateValidationResult, verifyEmail);
 
 // now export the router
