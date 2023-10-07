@@ -206,7 +206,7 @@ const unblockPlayer = async (req, res) => {
         if (player) { 
 
             if (!player.isBlocked) {  // player is already unblocked
-                return res.status(400).json({ status: 400, message: "Player is already unblocked!" });
+                return res.status(200).json({ status: 200, message: "Player is already unblocked!" });
             }
 
             // now change the player block status

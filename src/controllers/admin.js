@@ -25,8 +25,8 @@ const createAdmin = async (req, res) => {
         gender: gender,
 
     })
-        .then(user => {  // sending response when admin created
-            return res.status(200).json({ "status": 200, "message": "Admin Created", "admin": user });
+        .then(admin => {  // sending response when admin created
+            return res.status(201).json({ "status": 201, "message": "Admin Created", "admin": admin });  // admin will land at the profile page
         })
         .catch(err => {
             return res.status(500).json({  // any unrecogonize error will be raised from here
@@ -49,7 +49,7 @@ const loginAdmin = async (req, res) => {
             admin = await Admin.findOne({ mobileNumber: userfield });
         else admin = await Admin.findOne({ email: userfield });
 
-        // if user doesn't exist with the given user field
+        // if admin doesn't exist with the given user field
         if (!admin) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
 
         // now, compare the password
@@ -76,10 +76,15 @@ const loginAdmin = async (req, res) => {
 
 // to fetch the admin details
 const getAdminDetails = async (req, res) => {
-    try {  // find the admin by id
-
+    try { 
+        // find the admin by id
         const admin = await Admin.findById(req.user.id).select('-password');
-        return res.status(200).json({ "status": 200, "message": "Admin Found", "data": admin });
+
+        // if there is no admin
+        if (!admin) return res.status(404).json({ status: 404, message: "Admin not found" });
+
+        // if admin found
+        return res.status(200).json({ status: 200, "message": "Admin Found", admin: admin });
 
     } catch (err) {
         return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
@@ -88,28 +93,31 @@ const getAdminDetails = async (req, res) => {
 
 // to delete the admin
 const deleteAdmin = async (req, res) => {
-
-    try {  // find the admin and delete it
+    try {  
+        // find the admin and delete it
         let admin = await Admin.findById(req.user.id);
-        if (!admin) return res.status(404).json({ status: 404, message: "User Not Found" });
+        if (!admin) return res.status(404).json({ status: 404, message: "Admin Not Found" });
 
         // now match the password
         const password = req?.body?.password;
+        if (!password) return res.status(404).json({ status: 404, message: "You need to send password." });
         if (!comparePassword(password, admin.password)) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
 
-        // now, delete the user
+        // now, delete the admin
         admin = await Admin.findByIdAndDelete(req.user.id);
-        return res.status(200).json({ status: 200, message: 'Admin Deleted', user: admin });
+        return res.status(200).json({ status: 200, message: 'Admin Deleted' });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", message: "You need to send Password in request body", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
 // to fetch all the user details (only admin can access)
 const getAllUsers = async (req, res) => {
 
-    try {
+    try {  // check that the user exist
+        if (!req?.user?.id) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+    
         // confirm that the user is admin
         let admin = await Admin.findById(req.user.id);
         if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
@@ -119,36 +127,39 @@ const getAllUsers = async (req, res) => {
         if (!users) return res.status(404).json({ status: 404, message: "user not found", data: users });
 
         // now, return all user data to the admin
-        return res.status(200).json({ status: 200, message: "users found", data: users })
+        return res.status(200).json({ status: 200, message: "users found", totalResults: users.length, users: users })
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
 // get all admin informations
 const getAllAdmins = async (req, res) => {
     try {
+        // check that the admin is logged in
+        if (!req?.user?.id) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
         // confirm that the user is admin
         let admin = await Admin.findById(req.user.id);
         if (!admin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
 
         // now, get all the admin list
         let admins = await Admin.find({}).select('-password');
-        if (!admins) return res.status(404).json({ status: 400, message: "user not found", data: admins });
+        if (!admins) return res.status(404).json({ status: 404, message: "Admin not found" });
 
         // now, return all admin data to the admin
-        return res.status(200).json({ status: 200, message: "users found", data: admins })
+        return res.status(200).json({ status: 200, message: "Admin Found!", totalResults: admins.length, admins: admins })
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
 // to delete any users
 const deleteAnyUser = async (req, res) => {
     try {
-
+        // fetch the user id from query params
         const userId = req.query['user-id'];
 
         // confirm that the given user exists
@@ -167,7 +178,7 @@ const deleteAnyUser = async (req, res) => {
         return res.status(200).json({ status: 200, message: 'User Deleted', user: user });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
@@ -178,28 +189,35 @@ const deleteAnyAdmin = async (req, res) => {
         const adminId = req.query['admin-id'];
         const password = req?.body?.password;
 
+        // validate the inputs
+        if (!adminId && password) return res.status(404).json({ status: 404, message: "Parameters missing" });
+
         // confirm that the given admin exists
         let admin = await Admin.findById(adminId);
         if (!admin) return res.status(404).json({ status: 404, message: "admin not found" });
 
-        // now, match the password of the curr admin
+        // fetch the current admin details
         let currAdmin = await Admin.findById(req.user.id);
+
+        // if current admin is not logged in as admin or doesn't exists
+        if (!currAdmin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
+
+        // now, compare the password of the admin and current admin
         if (!comparePassword(password, currAdmin.password)) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
 
         // now confirm that the request is maid from the superuser
-        if (!currAdmin) return res.status(401).json({ status: 401, message: "Access Denied!!" });
-        if (!currAdmin.superUser) return res.status(401).json({ status: 401, message: "Access Denied!!", info: "Super User Access Only!!" });
+        if (!currAdmin.superUser) return res.status(403).json({ status: 403, message: "Access Denied!!", info: "Super User Access Only!!" });
 
         // now, delete the admin
         admin = await Admin.findByIdAndDelete(adminId);
-        return res.status(200).json({ status: 200, message: 'Admin Deleted', user: admin });
+        return res.status(200).json({ status: 200, message: 'Admin Deleted' });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
-// to get the user details
+// to get the user details by their game-id
 const getTheUser = async (req, res) => {
     try {
         // fetch the user id from the body
@@ -217,11 +235,11 @@ const getTheUser = async (req, res) => {
         return res.status(200).json({ status: 200, message: "User found", user: user });
 
     } catch (err) {  // unrecogonized errors
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
-// to get the player details
+// to get the player details by game-id
 const getThePlayer = async (req, res) => {
     try {
         // fetch the user id from the body
@@ -233,17 +251,17 @@ const getThePlayer = async (req, res) => {
 
         // now check that the user exists
         let user = await User.findOne({ pubgID });
-        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found", info: "User doesn't exist in User model" });
 
         // now, get the player exists
         let player = await Player.findOne({ pubgID });
-        if (!player) return res.status(404).json({ status: 404, message: "Player Not Found" });
+        if (!player) return res.status(404).json({ status: 404, message: "Player Not Found", info: "Player doesn't exist in Player model" });
 
         // now, return the player
         return res.status(200).json({ status: 200, message: "Player Found!!", player: player });
 
     } catch (err) {  // unrecogonized errors
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
