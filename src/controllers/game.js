@@ -37,19 +37,19 @@ const createGame = async (req, res) => {
                     entryFee: entryFee,
                 })
                     .then((GameHistory) => {
-                        return res.status(200).json({ "status": 200, "message": "Game Created", "game": game });
+                        return res.status(201).json({ "status": 201, "message": "Game Created", "game": game });
                     })
                     .catch(err => {
-                        return res.status(500).json({ errors: "Internal server error", issue: err });
+                        return res.status(500).json({ status: 500, message: "Game is not added to GameHistory model", issue: err });
                     });
 
             })
             .catch(err => {
-                return res.status(500).json({ errors: "Internal server error", issue: err });
+                return res.status(500).json({ status: 500, message: "Game is not added to Game model", issue: err });
             });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
 
@@ -107,7 +107,7 @@ const getGames = async (req, res) => {
             if (user) {
                 // return all game data
                 game = await GameHistory.find();
-                return res.status(200).json({ status: 200, message: "Games found", totalGames: game.length, games: game });
+                return res.status(200).json({ status: 200, message: "Games found", totalResults: game.length, games: game });
             }
 
             // validating that the user is registerd as user
@@ -115,17 +115,18 @@ const getGames = async (req, res) => {
             if (user) {
                 // now return the some previous game information 
                 game = await GameHistory.find().select('-host');
-                return res.status(200).json({ status: 200, message: "Games found", totalGames: game.length, games: game });
+                return res.status(200).json({ status: 200, message: "Games found", totalResults: game.length, games: game });
             }
 
             // if the requested user is not admin and any user.
             else return res.status(404).json({ status: 404, message: "User Not Found" });
         }
 
-        else return res.status(404).json({ status: 404, message: "query not found" });
+        // the passed query is not recogonizable.
+        else return res.status(400).json({ status: 400, message: "Invalid Query Params" });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
 
@@ -152,7 +153,7 @@ const deleteGame = async (req, res) => {
         };
         
         // now, push the data into gameHistory with gameStatus=failed and gameDeletedOn=<current date>
-        let status = await GameHistory.updateOne({ gameId: game._id }, { $set: newGame }, { new: true });
+        await GameHistory.updateOne({ gameId: game._id }, { $set: newGame }, { new: true });
         return res.status(200).json({ "status": 200, "message": "Game Deleted" });
     }
 
@@ -180,10 +181,10 @@ const deleteGame = async (req, res) => {
             // now, delete the game
             _deleteGame(gameId, Game, GameHistory);
         }
-        else return res.status(401).json({ status: 401, message: "Access Denied!!" });  // any other admin want to delete the game
+        else return res.status(403).json({ status: 403, message: "Access Denied!!", info: "Admin access only!!" });  // any other admin want to delete the game
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
 
@@ -224,7 +225,7 @@ const updateGame = async (req, res) => {
 
             // fetch the game ID from the query
             const gameId = req.query['game-id'];
-            if (!gameId) return res.status(404).json({ status: 404, message: "game not found" });
+            if (!gameId) return res.status(400).json({ status: 400, message: "Invalid Game id" });
 
             // now confirm that the game exists
             let game = await Game.findById(gameId);
@@ -240,10 +241,10 @@ const updateGame = async (req, res) => {
         }
 
         // this will not send any json as response because status: 204
-        else res.status(204).json({status: 204, message: "Nothing is there to be updated"});
+        else res.status(204).json({ status: 204, message: "Nothing is there to be updated" });
 
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
 
