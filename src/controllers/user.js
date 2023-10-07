@@ -48,6 +48,10 @@ const createUser = async (req, res) => {
     })
         .then(async (user) => {  // sending response, when user is created
 
+            // now, check that the player is known to us (verify the problem at issue #103)
+            let newPlayer = await Player.findOne({ pubgID });
+            if (newPlayer) return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
+
             // now, create a player
             Player.create({
                 pubgID: user.pubgID,
