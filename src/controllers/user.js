@@ -54,12 +54,6 @@ const createUser = async (req, res) => {
                 pubgName: user.pubgName,
             })
                 .then(player => {
-                    // sending user id as payload, because accesssing data using id is easier
-                    const payloadData = {
-                        user: {
-                            id: user.id
-                        },
-                    };
 
                     // now generate an otp, save it and send it to user
                     const otp = generateOtp();
@@ -79,7 +73,7 @@ const createUser = async (req, res) => {
                             });
 
                             // user created successfully
-                            return res.status(200).json({ "status": 200, "message": "user created", "info": "Verify Your Email Address" });
+                            return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
                         })
                         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
                             errors: "Sending Email Failure!",
@@ -87,14 +81,14 @@ const createUser = async (req, res) => {
                         }));
 
                 })
-                .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
-                    errors: "Internal server error",
+                .catch(err => res.status(500).json({  // error while creating player
+                    errors: "Player Registration failed",
                     issue: err
                 }));
         })
 
-        .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
-            errors: "Internal server error",
+        .catch(err => res.status(500).json({  // error while creating user
+            errors: "User Registration Failed",
             issue: err
         }));
 };
@@ -115,7 +109,7 @@ const loginUser = async (req, res) => {
 
         // check that the user is ban or not
         let banUser = await Ban.findOne({ pubgID: user.pubgID });
-        if (banUser) return res.status(401).json({ status: 401, message: "You are banned, can't login!!" });
+        if (banUser) return res.status(403).json({ status: 403, message: "You are banned, can't login!!" });  // access forbidden, it's a user but don't have access to login
 
         // if user doesn't exist or wrong input fields
         if (!user) return res.status(400).json({ status: 400, message: "Invalid Credentials" });
@@ -151,12 +145,12 @@ const getUserDetails = async (req, res) => {
             .select('-password');  // not fetch password from db
 
         // if user is not in db
-        if (!user) return res.status(404).json({ "status": 404, "message": "User Not Found" });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
 
         // else return the user
-        return res.status(200).json({ "status": 200, "message": "User Found", "data": user });
+        return res.status(200).json({ status: 200, message: "User Found", user: user });
     } catch (err) {
-        res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 }
 
@@ -209,7 +203,7 @@ const setUserDetails = async (req, res) => {
         else res.status(204).json({ status: 204, message: "Nothing is there to be updated" });
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 
 };
@@ -222,15 +216,12 @@ const deleteUserAccount = async (req, res) => {
         let user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
 
-
-        // if not admin then delete (issue-12)
-
         // now, delete the user
         user = await User.findByIdAndDelete(req.user.id);
         return res.status(200).json({ status: 200, message: 'user deleted', user: user });
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
