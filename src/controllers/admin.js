@@ -26,7 +26,7 @@ const createAdmin = async (req, res) => {
 
     })
         .then(admin => {  // sending response when admin created
-            return res.status(200).json({ "status": 200, "message": "Admin Created", "admin": admin });  // admin will land at the profile page
+            return res.status(201).json({ "status": 201, "message": "Admin Created", "admin": admin });  // admin will land at the profile page
         })
         .catch(err => {
             return res.status(500).json({  // any unrecogonize error will be raised from here
