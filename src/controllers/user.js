@@ -111,6 +111,9 @@ const loginUser = async (req, res) => {
             user = await User.findOne({ mobileNumber: userfield });  // login with mobile no.
         else user = await User.findOne({ email: userfield });  // login with email
 
+        // if user is not there
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found!!" });
+
         // check that the user is ban or not
         let banUser = await Ban.findOne({ pubgID: user.pubgID });
         if (banUser) return res.status(403).json({ status: 403, message: "You are banned, can't login!!" });  // access forbidden, it's a user but don't have access to login
