@@ -34,16 +34,12 @@ const createUser = async (req, res) => {
         }
     }
 
-    // converting email to lowercase
-    let _email = req.body.email;
-    // _email = _email.toLowerCase();
-
     // create the user in db
     User.create({
         pubgID: req.body.pubgID,
         pubgName: req.body.pubgName,
         fullName: req.body.fullName,
-        email: _email,
+        email: req.body.email.toLowerCase(),  // converting email into lowercase
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
@@ -53,7 +49,7 @@ const createUser = async (req, res) => {
         .then(async (user) => {  // sending response, when user is created
 
             // now, check that the player is known to us (verify the problem at issue #103)
-            let newPlayer = await Player.findOne({ pubgID });
+            let newPlayer = await Player.findOne({ pubgID: req.body.pubgID });
             if (newPlayer) return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
 
             // now, create a player
@@ -61,10 +57,20 @@ const createUser = async (req, res) => {
                 pubgID: user.pubgID,
                 pubgName: user.pubgName,
             })
-                .then(player => {
+                .then(async (player) => {
 
-                    // now generate an otp, save it and send it to user
+                    // generate otp 
                     const otp = generateOtp();
+
+                    // now, insure that the email in not in verification
+                    let emailVerification = await EmailVerification.findOne({ email: user.email });
+                    if (emailVerification) {
+
+                        // user created successfully
+                        return res.status(400).json({ "status": 400, "message": "Email verification failed", "info": "try after 15 mins" });
+                    }
+
+                    // save otp and send it to user
                     EmailVerification.create({
                         email: user.email,
                         otpEmail: otp,
