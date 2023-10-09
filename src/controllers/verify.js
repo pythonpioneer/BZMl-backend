@@ -40,5 +40,10 @@ const verifyEmail = async (req, res) => {
     }
 };
 
+// to generate email otp
+const generateOtpEmail = async (req, res) => {
+    res.send("ok");
+};
+
 // export all functions
-module.exports = { verifyEmail };
+module.exports = { verifyEmail, generateOtpEmail };
