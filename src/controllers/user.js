@@ -86,7 +86,7 @@ const createUser = async (req, res) => {
                                 html: otpTemplate
                             });
 
-                            // user created successfully
+                            // email verification failed because the email exists in the EmailVerification model
                             return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
                         })
                         .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
