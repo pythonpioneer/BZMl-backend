@@ -34,12 +34,16 @@ const createUser = async (req, res) => {
         }
     }
 
+    // converting email to lowercase
+    let _email = req.body.email;
+    // _email = _email.toLowerCase();
+
     // create the user in db
     User.create({
         pubgID: req.body.pubgID,
         pubgName: req.body.pubgName,
         fullName: req.body.fullName,
-        email: req.body.email,
+        email: _email,
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
