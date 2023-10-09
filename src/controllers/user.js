@@ -39,7 +39,7 @@ const createUser = async (req, res) => {
         pubgID: req.body.pubgID,
         pubgName: req.body.pubgName,
         fullName: req.body.fullName,
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),  // converting email into lowercase
         mobileNumber: req.body.mobileNumber,
         password: securePassword,
         gender: gender,
@@ -48,15 +48,29 @@ const createUser = async (req, res) => {
     })
         .then(async (user) => {  // sending response, when user is created
 
+            // now, check that the player is known to us (verify the problem at issue #103)
+            let newPlayer = await Player.findOne({ pubgID: req.body.pubgID });
+            if (newPlayer) return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
+
             // now, create a player
             Player.create({
                 pubgID: user.pubgID,
                 pubgName: user.pubgName,
             })
-                .then(player => {
+                .then(async (player) => {
 
-                    // now generate an otp, save it and send it to user
+                    // generate otp 
                     const otp = generateOtp();
+
+                    // now, insure that the email in not in verification
+                    let emailVerification = await EmailVerification.findOne({ email: user.email });
+                    if (emailVerification) {
+
+                        // user created successfully
+                        return res.status(400).json({ "status": 400, "message": "Email verification failed", "info": "try after 15 mins" });
+                    }
+
+                    // save otp and send it to user
                     EmailVerification.create({
                         email: user.email,
                         otpEmail: otp,
@@ -106,6 +120,9 @@ const loginUser = async (req, res) => {
         if (isNumber(userfield))
             user = await User.findOne({ mobileNumber: userfield });  // login with mobile no.
         else user = await User.findOne({ email: userfield });  // login with email
+
+        // if user is not there
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found!!" });
 
         // check that the user is ban or not
         let banUser = await Ban.findOne({ pubgID: user.pubgID });
