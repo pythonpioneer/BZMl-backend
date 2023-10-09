@@ -33,7 +33,7 @@ exports.descriptions = {
     password: {
         "min-length": 6,
         "max-length": 18,
-        "type": "alpha-numeric",
+        "type": "any",
         "unique": false,
     },
     gender: {

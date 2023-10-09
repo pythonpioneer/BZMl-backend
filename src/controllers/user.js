@@ -261,4 +261,9 @@ const generateRef = async (req, res) => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef };
+// to update the password of users
+const updatePassword = async (req, res) => {
+    res.send("ok")
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword };
