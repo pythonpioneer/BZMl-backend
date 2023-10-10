@@ -30,7 +30,7 @@ exports.descriptions = {
         "type": "numeric",
         "unique": true,
     },
-    password: {
+    password: {  // in future, we can use this, body('password').isStrongPassword({})
         "min-length": 6,
         "max-length": 18,
         "type": "any",
