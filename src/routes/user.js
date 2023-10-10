@@ -7,7 +7,7 @@ const { validateUpdationField, validateRefCode } = require('../middleware/valida
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = express.Router();
 
-// validating the password
+// validating the passwords
 const _validatePassword = [
     body('oldPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
     body('newPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),

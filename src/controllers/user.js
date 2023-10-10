@@ -290,8 +290,6 @@ const updatePassword = async (req, res) => {
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
-
-    res.send("ok");
 };
 
 module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword };
