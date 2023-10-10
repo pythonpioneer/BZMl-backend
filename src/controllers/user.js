@@ -257,12 +257,40 @@ const generateRef = async (req, res) => {
         return res.status(200).json({ status: 200, message: "Referral code updated", user: user });
 
     } catch (err) {
-        res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
 
 // to update the password of users
 const updatePassword = async (req, res) => {
+    try {  
+        // fetch the passwords from the request body
+        const { oldPassword, newPassword } = req.body;
+
+        // confirms that the user is validated
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
+
+        // now, match the old password of the user, if not same then send 
+        if (!comparePassword(oldPassword, user.password)) return res.status(401).json({ status: 401, message: "Invalid Credentials, Authentication Failed!!" });
+
+        // now, check that the old and new passwords are not same
+        if (oldPassword === newPassword) return res.status(400).json({ status: 400, message: "Old and new passwords must be different." });
+
+        // generate password using bcrypt
+        const securePassword = generatePassword(newPassword);
+
+        // now, change the password
+        user.password = securePassword;
+        user.save();
+
+        // user's password updated
+        return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
+        
+    } catch (err) {
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+
     res.send("ok");
 };
 
