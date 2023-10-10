@@ -15,7 +15,7 @@ const _validateBaseFields = [  // add fields that can be updated only
 // adding extra fields to validate the user input
 const _validateMoreFields = [  // add fields that can not be updated
     body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }).custom(async (pubgID) => await findRecord('User', { pubgID })),
-    body('password', 'Enter a valid password').isAlphanumeric().isLength({ min: 6, max: 18 }),
+    body('password', 'Enter a valid password').isLength({ min: 6, max: 18 }),
     body('refCode', 'Enter refral code (not required)').isLength({ max: 50 }),
 ]
 
@@ -32,7 +32,7 @@ exports.validateRegistrationField = [
 // A validation array to validate user input field for login
 exports.validateLoginField = [
     body('userfield', 'enter valid mobileNumber/email to login').isLength({ min: 9, max: 50 }),
-    body('password', "Enter valid password").isAlphanumeric().isLength({ min: 6, max: 18 })
+    body('password', "Enter valid password").isLength({ min: 6, max: 18 })
 ];
 
 // A validation array to validate user input field to update details
