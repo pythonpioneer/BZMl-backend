@@ -3,11 +3,12 @@ const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
-const { sendMail, otpEmailTemplate } = require('../helper/utility/sendMail');
+const { sendMail } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
+const { otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
 
 
 // to create user

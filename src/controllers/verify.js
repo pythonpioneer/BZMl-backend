@@ -9,7 +9,10 @@ const { otpEmailTemplate, sendMail } = require('../helper/utility/sendMail');
 const verifyEmail = async (req, res) => {
     try {
         // fetch the data from the body
-        const { email, otp } = req.body;
+        let { email, otp } = req.body;
+
+        // converting email into lowercase
+        email = email.toLowerCase();
 
         // now, find that the email exists as user
         let user = await User.findOne({ email });
