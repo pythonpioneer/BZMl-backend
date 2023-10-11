@@ -8,7 +8,7 @@ const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
-const { otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
+const { otpEmailTemplate, notifyPasswordUpdation } = require('../helper/utility/emailTemplates/emailTemp');
 
 
 // to create user
@@ -284,6 +284,16 @@ const updatePassword = async (req, res) => {
         // now, change the password
         user.password = securePassword;
         user.save();
+
+        // now, send notification to the user
+        const notify = notifyPasswordUpdation(user.fullName);
+
+        // now send the email to the user
+        sendMail({
+            to: user.email,
+            subject: "Password Changed Successfully",
+            html: notify
+        });
 
         // user's password updated
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
