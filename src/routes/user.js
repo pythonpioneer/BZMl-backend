@@ -33,8 +33,8 @@ router.patch('/refcode', validateRefCode, validateValidationResult, fetchUser, g
 // Route 7: To update the logged in user's password: '/bzml/api/v1/user/update-password' [using PATCH] (login required)
 router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
 
-// Route 8; To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using PATCH] (login not required)
-router.patch('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
+// Route 8; To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using POST] (login not required)
+router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
 // export router
 module.exports = router;

@@ -287,12 +287,12 @@ const updatePassword = async (req, res) => {
         user.save();
 
         // generate the notification template
-        const notify = notifyPasswordUpdation(user.fullName);
+        const notify = notifyPasswordUpdation(user.fullName, "Password Changed Successfully");
 
         // now send the email to the user
         sendMail({
             to: user.email,
-            subject: "Password Changed Successfully",
+            subject: "BZML Password Changed Successfully",
             html: notify
         });
 
