@@ -303,4 +303,9 @@ const updatePassword = async (req, res) => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword };
+// to recover the user's password
+const recoverPassword = async (req, res) => {
+    res.send("ok");
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword };
