@@ -3,11 +3,12 @@ const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
-const { sendMail, otpEmailTemplate } = require('../helper/utility/sendMail');
+const { sendMail } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
+const { otpEmailTemplate, notifyPasswordUpdation } = require('../helper/utility/emailTemplates/emailTemp');
 
 
 // to create user
@@ -283,6 +284,16 @@ const updatePassword = async (req, res) => {
         // now, change the password
         user.password = securePassword;
         user.save();
+
+        // generate the notification template
+        const notify = notifyPasswordUpdation(user.fullName);
+
+        // now send the email to the user
+        sendMail({
+            to: user.email,
+            subject: "Password Changed Successfully",
+            html: notify
+        });
 
         // user's password updated
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });

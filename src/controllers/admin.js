@@ -5,6 +5,8 @@ const { generateToken } = require('../middleware/auth/authMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const User = require('../models/user/User');
 const Player = require('../models/players/Player');
+const { notifyPasswordUpdation } = require('../helper/utility/emailTemplates/emailTemp');
+const { sendMail } = require('../helper/utility/sendMail');
 
 // to create admins
 const createAdmin = async (req, res) => {
@@ -287,6 +289,16 @@ const updatePassword = async (req, res) => {
         // now, change the password
         admin.password = securePassword;
         admin.save();
+
+        // // generate the notification template
+        const notify = notifyPasswordUpdation(admin.fullName);
+
+        // notify the admin that the password has been changed
+        sendMail({
+            to: admin.email,
+            subject: "Password Changed Successfully",
+            html: notify
+        });
 
         // admin's password updated
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
