@@ -16,6 +16,11 @@ const _validatePassword = [
     body('newPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
 ];
 
+// validating the email field
+const _validateEmail = [
+    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }),
+];
+
 /* Creating routes for CRUD operations on Admins. */
 // Route 1: To create an admin: '/bzml/api/v1/admin/create-admin' [using POST] (login not required)
 router.post('/create-admin', validateRegField, validateValidationResult, createAdmin);
@@ -85,6 +90,11 @@ router.get('/get-the-player', [
 
 // Route 11: To update the logged in admin's password (only admin access): '/bzml/api/v1/admin/update-password' [using PATCH] (login required)
 router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
+
+// Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
+router.post('/recover-password', _validateEmail, validateValidationResult, (req, res) => {
+    res.send("ok")
+});
 
 
 // export the router
