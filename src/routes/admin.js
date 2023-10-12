@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -92,9 +92,7 @@ router.get('/get-the-player', [
 router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
 
 // Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
-router.post('/recover-password', _validateEmail, validateValidationResult, (req, res) => {
-    res.send("ok")
-});
+router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
 
 // export the router
