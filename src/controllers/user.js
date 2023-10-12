@@ -285,7 +285,7 @@ const updatePassword = async (req, res) => {
         user.password = securePassword;
         user.save();
 
-        // now, send notification to the user
+        // generate the notification template
         const notify = notifyPasswordUpdation(user.fullName);
 
         // now send the email to the user
