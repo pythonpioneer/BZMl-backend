@@ -1,5 +1,6 @@
 // importing all requirements
 const User = require('../models/user/User');
+const Admin = require('../models/user/Admin');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
 const { generateOtp } = require('../helper/utility/generate');
 const { sendMail } = require('../helper/utility/sendMail');
@@ -104,12 +105,29 @@ const generateOtpEmail = async (req, res) => {
 // to recover the user password (forgot password)
 const recoverUserPassword = async (req, res) => {
     try {
+        // fetch the query params
+        const userType = req.query['user'];
+
         // fetch the data from the body
         let { otp, password } = req.body;
         const email = req.body.email.toLowerCase();
+        let user;
 
-        // now find that the user exists
-        let user = await User.findOne({ email });
+        if (userType === 'user'){  // if user is hitting the forgot password api
+
+            // now find that the user exists
+            user = await User.findOne({ email });
+        }
+        else if (userType === 'admin'){  // if admin is hitting the forgot password api
+
+            // now find that the admin exists
+            user = await Admin.findOne({ email });
+        }
+        else {  // query doesn't match or query is missing
+            return res.status(404).json({ status: 404, message: "Query Parameter missing" });
+        }
+
+        // if there is no user or admin
         if (!user) return res.status(404).json({ status: 404, message: "User Not Found!" });
 
         // confirm that the user has generated the otp
@@ -129,18 +147,17 @@ const recoverUserPassword = async (req, res) => {
         user.password = securePassword;
         user.save();
 
-        // now clear the otp
-        pin.otpEmail = "";
-        pin.save();
+        // now, delete the record from the db
+        await RecoverPassword.findByIdAndDelete(pin._id);
 
         // generate the template to notify the user
         let emailTemp = notifyPasswordUpdation(user.fullName, "Password generated successfully");
 
         // notify the user that password has been changed
         sendMail({
-            to: user.email,
-            subject: "BZML Password generated successfully",
-            html: emailTemp
+                to: user.email,
+                subject: "BZML Password generated successfully",
+                html: emailTemp
         });
 
         // password updated successfully

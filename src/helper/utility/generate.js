@@ -7,7 +7,7 @@ exports.generateOtp = () => {
 
     else {  // if otp is not 6 char long then add 0 to all the missing places
         let n = 6 - otp.length;
-        otp = otp * Math.pow(10, n);
+        otp += Math.pow(10, n-1);
 
         return otp;
     }

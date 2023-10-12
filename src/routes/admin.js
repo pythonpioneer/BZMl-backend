@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -14,6 +14,11 @@ const router = express.Router();
 const _validatePassword = [
     body('oldPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
     body('newPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
+];
+
+// validating the email field
+const _validateEmail = [
+    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }),
 ];
 
 /* Creating routes for CRUD operations on Admins. */
@@ -85,6 +90,9 @@ router.get('/get-the-player', [
 
 // Route 11: To update the logged in admin's password (only admin access): '/bzml/api/v1/admin/update-password' [using PATCH] (login required)
 router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
+
+// Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
+router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
 
 // export the router

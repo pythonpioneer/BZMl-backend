@@ -5,8 +5,10 @@ const { generateToken } = require('../middleware/auth/authMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const User = require('../models/user/User');
 const Player = require('../models/players/Player');
-const { notifyPasswordUpdation } = require('../helper/utility/emailTemplates/emailTemp');
+const RecoverPassword = require('../models/verfiy/RecoverPass');
+const { notifyPasswordUpdation, otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
 const { sendMail } = require('../helper/utility/sendMail');
+const { generateOtp } = require('../helper/utility/generate');
 
 // to create admins
 const createAdmin = async (req, res) => {
@@ -164,6 +166,9 @@ const deleteAnyUser = async (req, res) => {
         // fetch the user id from query params
         const userId = req.query['user-id'];
 
+        // if the query param is missing
+        if(!userId) return res.status(404).json({ status: 404, message: "Parameters missing" });
+
         // confirm that the given user exists
         let user = await User.findById(userId);
         if (!user) return res.status(404).json({ status: 404, message: "user not found" });
@@ -304,9 +309,57 @@ const updatePassword = async (req, res) => {
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
         
     } catch (err) {
-        return res.status(500).json({ errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+    }
+};
+
+// to recover the admin's password using otp
+const recoverPassword = async (req, res) => {
+    try {
+
+        // fetch the email from the body
+        const email = req.body.email.toLowerCase();
+
+        // confirm that the email belongs to the admin
+        let admin = await Admin.findOne({ email });
+        if (!admin) return res.status(404).json({ status: 404, message: "Admin Not Found" });
+
+        // now, send generate the otp
+        const otp = generateOtp();
+
+        // confirm that the user is not already otp generated
+        let recoverAdmin = await RecoverPassword.findOne({ email });
+        if (recoverAdmin) return res.status(400).json({ "status": 400, "message": "Recovery failed", "info": "try after 15 mins" });
+
+        // now, save the otp in the recover model
+        RecoverPassword.create({
+            email: admin.email,
+            otpEmail: otp
+        })
+            .then((recoverAdmin) => {  // otp saved into the model
+
+                // now, generate the email
+                let otpTemplate = otpEmailTemplate(admin.fullName, recoverAdmin.otpEmail, "Forgot Password Verification");
+
+                // now, send the email
+                sendMail({
+                    to: admin.email,
+                    subject: "BZML Forgot Password Verification",
+                    html: otpTemplate,
+                });
+
+                // otp sent successfully
+                return res.status(200).json({ status: 200, message: "OTP sent to your email", info: "verify your Email" });
+            })
+            .catch(err => res.status(500).json({  // failure in recover password model
+                errors: "Email Failure!",
+                issue: err
+            }));
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
     }
 };
 
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword };

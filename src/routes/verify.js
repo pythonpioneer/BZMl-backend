@@ -28,8 +28,8 @@ router.post('/generate-email-otp', _validateEmail, validateValidationResult, fet
 // Route 2: To verify user Email Address using OTP: '/bzml/api/v1/verify/email' [using POST] (login not required)
 router.post('/email', _validateFields, validateValidationResult, verifyEmail);
 
-// Route 3: To implement forgot password using OTP: '/bzml/api/v1/verify/recover-user' [using POST] (login not required)
-router.post('/recover-user', [
+// Route 3: To implement forgot password using OTP: '/bzml/api/v1/verify/recover-password?user=<user/admin>' [using POST] (login not required)
+router.post('/recover-password', [
     ..._validateFields,
     ..._validatePassword
 ], 
