@@ -5,12 +5,12 @@
  */
 
 // creating beautiful templates for email verification (to send OTP)
-exports.otpEmailTemplate = (name, otp) => `<!DOCTYPE html>
+exports.otpEmailTemplate = (name, otp, title) => `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BZML Email Verification</title>
+    <title>BZML Verification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -44,7 +44,7 @@ exports.otpEmailTemplate = (name, otp) => `<!DOCTYPE html>
 </head>
 <body>
     <div class="container">
-        <h1>Email Verification</h1>
+        <h1>${title}</h1>
         <p>Hello, ${name}!</p>
         <p>This is a sample email template with a beautiful design.</p>
         <p>Here is Your OTP, </p>
@@ -56,12 +56,12 @@ exports.otpEmailTemplate = (name, otp) => `<!DOCTYPE html>
 `
 
 // password updation email template
-exports.notifyPasswordUpdation = (name) => `<!DOCTYPE html>
+exports.notifyPasswordUpdation = (name, title) => `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Change Confirmation</title>
+    <title>BZML Password Change Confirmation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -105,7 +105,7 @@ exports.notifyPasswordUpdation = (name) => `<!DOCTYPE html>
 <body>
     <div class="message-box">
         <i class="fas fa-check-circle success-icon"></i>
-        <h1>Password Changed Successfully</h1>
+        <h1>${title}</h1>
 
         <h3>Hello, ${name}</h3>
         <p>Your password has been updated.</p>

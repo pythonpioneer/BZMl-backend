@@ -2,7 +2,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
-const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword } = require('../controllers/user');
+const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword } = require('../controllers/user');
 const { validateUpdationField, validateRefCode } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = express.Router();
@@ -11,6 +11,11 @@ const router = express.Router();
 const _validatePassword = [
     body('oldPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
     body('newPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
+];
+
+// validating the email field
+const _validateEmail = [
+    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }),
 ];
 
 // Route 3: To get logged in user detail: '/bzml/api/v1/user/getuser' [using GET] (login required)
@@ -27,6 +32,9 @@ router.patch('/refcode', validateRefCode, validateValidationResult, fetchUser, g
 
 // Route 7: To update the logged in user's password: '/bzml/api/v1/user/update-password' [using PATCH] (login required)
 router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
+
+// Route 8; To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using POST] (login not required)
+router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
 // export router
 module.exports = router;

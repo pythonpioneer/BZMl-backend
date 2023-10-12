@@ -3,6 +3,7 @@ const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
+const RecoverPassword = require('../models/verfiy/RecoverPass');
 const { sendMail } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
@@ -67,7 +68,7 @@ const createUser = async (req, res) => {
                     let emailVerification = await EmailVerification.findOne({ email: user.email });
                     if (emailVerification) {
 
-                        // user created successfully
+                        // email verification failed because the email exists in the EmailVerification model
                         return res.status(400).json({ "status": 400, "message": "Email verification failed", "info": "try after 15 mins" });
                     }
 
@@ -78,7 +79,7 @@ const createUser = async (req, res) => {
                     })
                         .then((verify) => {
 
-                            let otpTemplate = otpEmailTemplate(user.fullName, otp);
+                            let otpTemplate = otpEmailTemplate(user.fullName, otp, "Email Verification");
 
                             // now send the email to the user
                             sendMail({
@@ -87,11 +88,11 @@ const createUser = async (req, res) => {
                                 html: otpTemplate
                             });
 
-                            // email verification failed because the email exists in the EmailVerification model
+                            // email sent successfully, user created
                             return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
                         })
-                        .catch(err => res.status(500).json({  // any unrecogonize error will be raised from here
-                            errors: "Sending Email Failure!",
+                        .catch(err => res.status(500).json({  // failure in email verification model
+                            errors: "Email Failure!",
                             issue: err
                         }));
 
@@ -286,12 +287,12 @@ const updatePassword = async (req, res) => {
         user.save();
 
         // generate the notification template
-        const notify = notifyPasswordUpdation(user.fullName);
+        const notify = notifyPasswordUpdation(user.fullName, "Password Changed Successfully");
 
         // now send the email to the user
         sendMail({
             to: user.email,
-            subject: "Password Changed Successfully",
+            subject: "BZML Password Changed Successfully",
             html: notify
         });
 
@@ -303,4 +304,52 @@ const updatePassword = async (req, res) => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword };
+// to recover the user's password
+const recoverPassword = async (req, res) => {
+    try {
+        // fetch the email from the body
+        const email = req.body.email.toLowerCase();
+
+        // now, check that the user exists
+        let user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ status: 404, message: "User not Found!!" });
+
+        // now, send generate the otp
+        const otp = generateOtp();
+
+        // confirm that the user is not already otp generated
+        let recoverUser = await RecoverPassword.findOne({ email });
+        if (recoverUser) return res.status(400).json({ "status": 400, "message": "Recovery failed", "info": "try after 15 mins" });
+
+        // now, save the otp into the model to recover
+        RecoverPassword.create({
+            email: user.email,
+            otpEmail: otp
+        })
+            .then((recoverUser) => {  // otp is now saved in the model
+
+                // now, generate the email
+                let otpTemplate = otpEmailTemplate(user.fullName, recoverUser.otpEmail, "Forgot Password Verification");
+
+                // now, send the otp to the user
+                sendMail({
+                    to: user.email,
+                    subject: "BZML Forgot Password Verification",
+                    html: otpTemplate
+                });
+
+                // otp sent successfully
+                return res.status(200).json({ status: 200, message: "OTP sent to your email", info: "verify your Email" });
+
+            })
+            .catch(err => res.status(500).json({  // failure in recover password model
+                errors: "Email Failure!",
+                issue: err
+            }));
+
+    } catch (err) {   // any unrecogonize error will be raised from here
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword };
