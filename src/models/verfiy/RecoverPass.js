@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-
 // now, create the game model
 const recoverPasswordSchema = new Schema({
     email: {
