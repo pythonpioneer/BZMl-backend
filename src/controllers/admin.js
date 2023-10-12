@@ -166,6 +166,9 @@ const deleteAnyUser = async (req, res) => {
         // fetch the user id from query params
         const userId = req.query['user-id'];
 
+        // if the query param is missing
+        if(!userId) return res.status(404).json({ status: 404, message: "Parameters missing" });
+
         // confirm that the given user exists
         let user = await User.findById(userId);
         if (!user) return res.status(404).json({ status: 404, message: "user not found" });

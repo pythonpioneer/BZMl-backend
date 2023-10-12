@@ -104,47 +104,55 @@ const generateOtpEmail = async (req, res) => {
 // to recover the user password (forgot password)
 const recoverUserPassword = async (req, res) => {
     try {
+        // fetch the query params
+        const userType = req.query['user'];
+
         // fetch the data from the body
         let { otp, password } = req.body;
         const email = req.body.email.toLowerCase();
 
-        // now find that the user exists
-        let user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ status: 404, message: "User Not Found!" });
+        if (userType === 'user'){
 
-        // confirm that the user has generated the otp
-        let pin = await RecoverPassword.findOne({ email }); 
-        if (!pin) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
+            // now find that the user exists
+            let user = await User.findOne({ email });
+            if (!user) return res.status(404).json({ status: 404, message: "User Not Found!" });
 
-        // if otp is cleared after password updation
-        if (pin.otpEmail.length < 6) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
+            // confirm that the user has generated the otp
+            let pin = await RecoverPassword.findOne({ email }); 
+            if (!pin) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
 
-        // if OTP is generated then match the OTP
-        if (otp !== pin.otpEmail) return res.status(400).json({ status: 400, message: "Invalid OTP" });
+            // if otp is cleared after password updation
+            if (pin.otpEmail.length < 6) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
 
-        // generate password using bcrypt
-        const securePassword = generatePassword(password);
+            // if OTP is generated then match the OTP
+            if (otp !== pin.otpEmail) return res.status(400).json({ status: 400, message: "Invalid OTP" });
 
-        // now, change the password
-        user.password = securePassword;
-        user.save();
+            // generate password using bcrypt
+            const securePassword = generatePassword(password);
 
-        // now clear the otp
-        pin.otpEmail = "";
-        pin.save();
+            // now, change the password
+            user.password = securePassword;
+            user.save();
 
-        // generate the template to notify the user
-        let emailTemp = notifyPasswordUpdation(user.fullName, "Password generated successfully");
+            // now, delete the record from the db
+            await RecoverPassword.findByIdAndDelete(pin._id);
 
-        // notify the user that password has been changed
-        sendMail({
-            to: user.email,
-            subject: "BZML Password generated successfully",
-            html: emailTemp
-        });
+            // generate the template to notify the user
+            let emailTemp = notifyPasswordUpdation(user.fullName, "Password generated successfully");
 
-        // password updated successfully
-        return res.status(200).json({ status: 200, message: "Password updated succesfully!!" });
+            // notify the user that password has been changed
+            sendMail({
+                to: user.email,
+                subject: "BZML Password generated successfully",
+                html: emailTemp
+            });
+
+            // password updated successfully
+            return res.status(200).json({ status: 200, message: "Password updated succesfully!!" });
+        }
+        else {  // query doesn't match or query is missing
+            return res.status(404).json({ status: 404, message: "Query Parameter missing" });
+        }
 
     } catch (err) {  // unreocgonized errors
         return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
