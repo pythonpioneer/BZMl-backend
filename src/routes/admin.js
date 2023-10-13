@@ -22,8 +22,8 @@ const _validateEmail = [
 ];
 
 /* Creating routes for CRUD operations on Admins. */
-// Route 1: To create an admin: '/bzml/api/v1/admin/create-admin' [using POST] (login not required)
-router.post('/create-admin', validateRegField, validateValidationResult, createAdmin);
+// Route 1: To create an admin (admin access only): '/bzml/api/v1/admin/create-admin' [using POST] (login required)
+router.post('/create-admin', validateRegField, validateValidationResult, fetchUser, createAdmin);
 
 // Route 2: To login admin: '/bzml/api/v1/admin/' [using POST] (login not required)
 router.post('/', validateLoginField, validateValidationResult, loginAdmin);
