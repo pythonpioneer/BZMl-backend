@@ -95,7 +95,18 @@ router.patch('/update-password', _validatePassword, validateValidationResult, fe
 router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
 // Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
-router.patch('/verify-player');
+router.patch('/verify-player', [
+    body('verifyPlayer').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+    body('verifyUser').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+    body('verifygame').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+    body('isVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+],
+    validateValidationResult,
+    fetchUser,
+    (req, res) => {
+        res.send("ok");
+    }
+);
 
 
 // export the router
