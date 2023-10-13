@@ -94,6 +94,9 @@ router.patch('/update-password', _validatePassword, validateValidationResult, fe
 // Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
 router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
 
+// Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
+router.patch('/verify-player');
+
 
 // export the router
 module.exports = router;
