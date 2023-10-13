@@ -1,9 +1,9 @@
 // importing all requirements
-const Admin = require('../models/user/Admin');
 const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
 const { generateToken } = require('../middleware/auth/authMiddleware');
 const { isNumber } = require('../helper/utility/fieldIdentifier');
 const User = require('../models/user/User');
+const Admin = require('../models/user/Admin');
 const Player = require('../models/players/Player');
 const RecoverPassword = require('../models/verfiy/RecoverPass');
 const { notifyPasswordUpdation, otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
@@ -15,6 +15,10 @@ const createAdmin = async (req, res) => {
 
     // generate a secure password
     const securePassword = generatePassword(req.body.password);
+
+    // confirm that the user is logged in as admin
+    const loggedInAdmin = await Admin.findById(req.user.id);
+    if (!loggedInAdmin) return res.status(401).json({ status: 401, message: "LogIn required!!", info: "Admin access only!!" });
 
     // fetch the gender and convert it to single uppercase letter.
     let gender = req.body.gender[0];
