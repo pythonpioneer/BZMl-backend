@@ -6,15 +6,9 @@ const { validateRegField } = require('../middleware/validator/admin/validateAdmi
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
-
-// now creating router, to map all routes
+const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const router = express.Router();
 
-// validating the passwords
-const _validatePassword = [
-    body('oldPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
-    body('newPassword', 'Enter a valid password').isLength({ min: 6, max: 18 }),
-];
 
 // validating the email field
 const _validateEmail = [
@@ -32,15 +26,7 @@ router.post('/', validateLoginField, validateValidationResult, loginAdmin);
 router.get('/', fetchUser, getAdminDetails);
 
 // Route 4: To delete the logged in admin: '/bzml/api/v1/admin/delete-admin' [using DELETE] (login required)
-router.delete('/delete-admin', [
-    body('password', "Enter valid password")
-        .isAlphanumeric()
-        .isLength({ min: 6, max: 18 })
-],
-    validateValidationResult,
-    fetchUser,
-    deleteAdmin
-);
+router.delete('/delete-admin', validatePassword(['password']), validateValidationResult, fetchUser, deleteAdmin);
 
 // Route 5: To access all users information (only admin to access): '/bzml/api/v1/admin/get-all-users' [using GET] (login required)
 router.get('/get-all-users', fetchUser, getAllUsers);
@@ -49,26 +35,10 @@ router.get('/get-all-users', fetchUser, getAllUsers);
 router.get('/get-all-admin', fetchUser, getAllAdmins);
 
 // Route 7: To delete any user (only admin access): '/bzml/api/v1/admin/delete-the-user?user-id=<user id>' [using DELETE] (login required)
-router.delete('/delete-the-user', [
-    body('password', "Enter valid password")
-        .isAlphanumeric()
-        .isLength({ min: 6, max: 18 })
-],
-    validateValidationResult,
-    fetchUser,
-    deleteAnyUser
-);
+router.delete('/delete-the-user', validatePassword(['password']), validateValidationResult, fetchUser, deleteAnyUser);
 
 // Route 8: To delete any admin (only admin access): '/bzml/api/v1/admin/delete-the-admin?user-id=<user id>' [using DELETE] (login required)
-router.delete('/delete-the-admin', [
-    body('password', "Enter valid password")
-        .isAlphanumeric()
-        .isLength({ min: 6, max: 18 })
-],
-    validateValidationResult,
-    fetchUser,
-    deleteAnyAdmin
-);
+router.delete('/delete-the-admin', validatePassword(['password']), validateValidationResult, fetchUser, deleteAnyAdmin);
 
 // Route 9: To get the user by user-id (only admin access): '/bzml/api/v1/admin/get-the-user' [using GET] (login required)
 router.get('/get-the-user', [
@@ -89,7 +59,7 @@ router.get('/get-the-player', [
 );
 
 // Route 11: To update the logged in admin's password (only admin access): '/bzml/api/v1/admin/update-password' [using PATCH] (login required)
-router.patch('/update-password', _validatePassword, validateValidationResult, fetchUser, updatePassword);
+router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']), validateValidationResult, fetchUser, updatePassword);
 
 // Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
 router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
