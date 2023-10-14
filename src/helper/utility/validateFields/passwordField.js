@@ -1,10 +1,10 @@
 // importing all requirements
-const { body, check } = require('express-validator');
+const { check } = require('express-validator');
 
 
 /**
  * This method is only used to validate the password fields.
- * @param {array} passwordNames - This method takes an array as input.
+ * @param {array} passwordNames - This method takes an array of password-names as input.
  * @returns {array} - It returns validation array to validate password fields
  */
 const validatePassword = (passwordNames) => {  // the password names can contain many password name
@@ -14,7 +14,7 @@ const validatePassword = (passwordNames) => {  // the password names can contain
     
     // traverse in the password Names
     return passwordNames.map(passwordName => {
-        return body(passwordName, `Enter a valid ${passwordName}`).isLength({ min: 6, max: 18 });
+        return check(passwordName, `Enter a valid ${passwordName}`).isLength({ min: 6, max: 18 });
     });
 };
 

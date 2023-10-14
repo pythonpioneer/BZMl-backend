@@ -7,13 +7,9 @@ const { validateLoginField } = require('../middleware/validator/validateFormFiel
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
+const { validateEmail } = require('../helper/utility/validateFields/emailField');
 const router = express.Router();
 
-
-// validating the email field
-const _validateEmail = [
-    body('email', 'Enter a valid Email').isEmail().isLength({ max: 50 }),
-];
 
 /* Creating routes for CRUD operations on Admins. */
 // Route 1: To create an admin (admin access only): '/bzml/api/v1/admin/create-admin' [using POST] (login required)
@@ -62,7 +58,7 @@ router.get('/get-the-player', [
 router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']), validateValidationResult, fetchUser, updatePassword);
 
 // Route 12; To recover the admin's forgotten password (only admin access): '/bzml/api/v1/admin/recover-password' [using POST] (login not required)
-router.post('/recover-password', _validateEmail, validateValidationResult, recoverPassword);
+router.post('/recover-password', validateEmail(['email']), validateValidationResult, recoverPassword);
 
 // Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
 router.patch('/verify-player', [
