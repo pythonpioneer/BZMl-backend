@@ -1,7 +1,7 @@
 // importing all requirements
 const express = require('express');
 const { body } = require('express-validator');
-const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword } = require('../controllers/admin');
+const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword, verifyPlayer } = require('../controllers/admin');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -96,18 +96,13 @@ router.post('/recover-password', _validateEmail, validateValidationResult, recov
 
 // Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
 router.patch('/verify-player', [
-    body('verifyPlayer').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
-    body('verifyUser').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
-    body('verifygame').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
-    body('isVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+    body('isUserVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
+    body('isGameVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
 ],
     validateValidationResult,
     fetchUser,
-    (req, res) => {
-        res.send("ok");
-    }
+    verifyPlayer
 );
-
 
 // export the router
 module.exports = router;

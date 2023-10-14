@@ -14,11 +14,6 @@ const playerSchema = new Schema({
         required: true,
         unique: true,
     },
-    isVerified: {  // The game id and the game name entered by user is verified or not (manual visiting by admins)
-        type: Boolean,
-        default: false,
-        required: true,
-    },
     isBan: {  // permanent ban, if any player try to hack the game in the match, then we will ban the user and player
         type: Boolean,
         default: false,
