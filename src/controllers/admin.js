@@ -38,7 +38,7 @@ const createAdmin = async (req, res) => {
         })
         .catch(err => {
             return res.status(500).json({  // any unrecogonize error will be raised from here
-                errors: "Internal server error",
+                message: "Internal server error",
                 issue: err,
             })
         });
@@ -76,7 +76,7 @@ const loginAdmin = async (req, res) => {
 
     } catch (err) {
         return res.status(500).json({  // any unrecogonize error will be raised from here
-            errors: "Internal server error",
+            message: "Internal server error",
             issue: err
         })
     }
@@ -95,7 +95,7 @@ const getAdminDetails = async (req, res) => {
         return res.status(200).json({ status: 200, "message": "Admin Found", admin: admin });
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -116,7 +116,7 @@ const deleteAdmin = async (req, res) => {
         return res.status(200).json({ status: 200, message: 'Admin Deleted' });
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -138,7 +138,7 @@ const getAllUsers = async (req, res) => {
         return res.status(200).json({ status: 200, message: "users found", totalResults: users.length, users: users })
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -160,7 +160,7 @@ const getAllAdmins = async (req, res) => {
         return res.status(200).json({ status: 200, message: "Admin Found!", totalResults: admins.length, admins: admins })
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -189,7 +189,7 @@ const deleteAnyUser = async (req, res) => {
         return res.status(200).json({ status: 200, message: 'User Deleted', user: user });
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -224,7 +224,7 @@ const deleteAnyAdmin = async (req, res) => {
         return res.status(200).json({ status: 200, message: 'Admin Deleted' });
 
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -246,7 +246,7 @@ const getTheUser = async (req, res) => {
         return res.status(200).json({ status: 200, message: "User found", user: user });
 
     } catch (err) {  // unrecogonized errors
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -272,7 +272,7 @@ const getThePlayer = async (req, res) => {
         return res.status(200).json({ status: 200, message: "Player Found!!", player: player });
 
     } catch (err) {  // unrecogonized errors
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -313,7 +313,7 @@ const updatePassword = async (req, res) => {
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
         
     } catch (err) {
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
@@ -361,9 +361,37 @@ const recoverPassword = async (req, res) => {
             }));
 
     } catch (err) {  // unrecogonized errors
-        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
+    }
+};
+
+// to verify the user status (includes isUserVerified, isGameVerified)
+const verifyPlayer = async (req, res) => {
+    try {
+        // fetching data from the request
+        const { isUserVerified, isGameVerified } = req.body;
+        const userId = req.query['user-id'];
+
+        // confirm that the request is made by admin
+        let admin = await Admin.findById(req.user.id);
+        if (!admin) return res.status(404).json({ status: 404, message: "Admin Not Found!!" });
+
+        // now, check that the user exists
+        let user = await User.findById(userId);
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found!!" });
+
+        // now, check that the user do have the given status and set the new status
+        user.isGameVerified = isGameVerified;
+        user.isVerified = isUserVerified;
+        user.save();
+
+        // user status updated
+        return res.status(200).json({ status: 200, message: "Status updated!" });
+        
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal server error", issue: err });
     }
 };
 
 // export all controller functions
-module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword };
+module.exports = { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword, verifyPlayer };

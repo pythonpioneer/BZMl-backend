@@ -210,6 +210,9 @@ const setUserDetails = async (req, res) => {
         }
 
         if (toBeUpdated) {
+            // chnaged the verification status of the user
+            updatedUser.isVerified = false;
+
             // now find the user that to be updated and confirm that the user exists
             let user = await User.findById(req.user.id);
             if (!user) res.status(404).json({ status: 404, message: "User Not Found" });
