@@ -8,6 +8,7 @@ const { validateValidationResult } = require('../middleware/validator/validation
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
+const { validateBooleanOnly } = require('../helper/utility/validateFields/booleanOnlyField');
 const router = express.Router();
 
 
@@ -61,14 +62,7 @@ router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']
 router.post('/recover-password', validateEmail(['email']), validateValidationResult, recoverPassword);
 
 // Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
-router.patch('/verify-player', [
-    body('isUserVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
-    body('isGameVerified').optional().custom(flag => flag === true || flag === false).withMessage('Flag property only accepts boolean'),
-],
-    validateValidationResult,
-    fetchUser,
-    verifyPlayer
-);
+router.patch('/verify-player', validateBooleanOnly(['isUserVerified', 'isGameVerified'], true), validateValidationResult, fetchUser, verifyPlayer);
 
 // export the router
 module.exports = router;
