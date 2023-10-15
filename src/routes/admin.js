@@ -10,6 +10,7 @@ const { validatePassword } = require('../helper/utility/validateFields/passwordF
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
 const { validateGameId } = require('../helper/utility/validateFields/gameIdField');
 const { validateBooleanOnly } = require('../helper/utility/validateFields/booleanOnlyField');
+const { validateMongoId } = require('../helper/utility/validateFields/mongoFields');
 const router = express.Router();
 
 
@@ -33,10 +34,16 @@ router.get('/get-all-users', fetchUser, getAllUsers);
 router.get('/get-all-admin', fetchUser, getAllAdmins);
 
 // Route 7: To delete any user (only admin access): '/bzml/api/v1/admin/delete-the-user?user-id=<user id>' [using DELETE] (login required)
-router.delete('/delete-the-user', validatePassword(['password']), validateValidationResult, fetchUser, deleteAnyUser);
+router.delete('/delete-the-user', [
+    ...validatePassword(['password']), // body
+    ...validateMongoId(['user-id']),  // query
+], validateValidationResult, fetchUser, deleteAnyUser);
 
 // Route 8: To delete any admin (only admin access): '/bzml/api/v1/admin/delete-the-admin?user-id=<user id>' [using DELETE] (login required)
-router.delete('/delete-the-admin', validatePassword(['password']), validateValidationResult, fetchUser, deleteAnyAdmin);
+router.delete('/delete-the-admin', [
+    ...validatePassword(['password']),  // body
+    ...validateMongoId(['admin-id']),  // query
+], validateValidationResult, fetchUser, deleteAnyAdmin);
 
 // Route 9: To get the user by user-id (only admin access): '/bzml/api/v1/admin/get-the-user' [using GET] (login required)
 router.get('/get-the-user', validateGameId(['pubgID'], false), validateValidationResult, fetchUser, getTheUser);
@@ -51,7 +58,10 @@ router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']
 router.post('/recover-password', validateEmail(['email']), validateValidationResult, recoverPassword);
 
 // Route 13: To verify status of the user and player (only admin access): '/bzml/api/v1/admin/verify-player' [using PATCH] (login required)
-router.patch('/verify-player', validateBooleanOnly(['isUserVerified', 'isGameVerified'], true), validateValidationResult, fetchUser, verifyPlayer);
+router.patch('/verify-player', [
+    ...validateBooleanOnly(['isUserVerified', 'isGameVerified'], true),  // body
+    ...validateMongoId(['user-id']),  // query
+],  validateValidationResult, fetchUser, verifyPlayer);
 
 // export the router
 module.exports = router;
