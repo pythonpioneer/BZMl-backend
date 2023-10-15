@@ -50,5 +50,5 @@ exports.validateUpdationField = _validateBaseFields.map((validationRule) => {  /
 
 // validating referral code 
 exports.validateRefCode = [
-    ...validateRefcode(['myRefCode'], false, { checkInDb: true, modelName: User })
+    ...validateRefcode(['myRefCode'], false, { checkInDb: true, modelName: 'User' })
 ];
