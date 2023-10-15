@@ -6,6 +6,7 @@ const { validateEmail } = require('../../helper/utility/validateFields/emailFiel
 const { validateGameName } = require('../../helper/utility/validateFields/gameNameField');
 const { validateFullName } = require('../../helper/utility/validateFields/fullNameField');
 const { validateMobile } = require('../../helper/utility/validateFields/mobileField');
+const { validateGender } = require('../../helper/utility/validateFields/genderField');
 
 
 // validate basic fields, which get duplicated in validateRetistration fields and in validateUpdation fields
@@ -14,7 +15,7 @@ const _validateBaseFields = [  // add fields that can be updated only
     ...validateFullName(['fullName']),
     ...validateEmail(['email'], false, { checkInDb: true, modelName: 'User' }),
     ...validateMobile(['mobileNumber'], false, { checkInDb: true, modelName: 'User'}),
-    body('gender', 'Enter gender initials').isAlpha().isLength({ min: 1, max: 1 }),
+    ...validateGender(['gender']),
 ];
 
 // adding extra fields to validate the user input

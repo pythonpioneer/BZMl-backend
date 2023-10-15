@@ -5,7 +5,7 @@ const { check } = require('express-validator');
  * This method is only used to validate the mobile fields.
  * @param {array} mobNumbers - This method takes an array of mobile numbers as input.
  * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @param {object} object - It contain two things, one checkInDb and the other is the model name, the checkInDb status told us to find the record in db and model name is where the record to be found
+ * @param {object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
  * @returns {array} - It returns validation array to validate mobile fields.
  */
  const validateMobile = (mobNumbers, isOptional, object) => {

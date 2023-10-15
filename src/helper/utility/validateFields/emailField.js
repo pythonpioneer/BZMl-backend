@@ -6,7 +6,7 @@ const { findRecord } = require('../findDb');
  * This method is only used to validate the email fields.
  * @param {array} emails - This method takes an array of email-names as input.
  * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @param {object} object - It contain two things, one checkInDb and the other is the model name, the checkInDb status told us to find the record in db and model name is where the record to be found
+ * @param {object} object - It contain two things, one checkInDb and the other is the modelName => object: { checkInDb: True, modelName: 'User' }
  * @returns {array} - It returns validation array to validate email fields.
  */
 const validateEmail = (emails, isOptional, object) => {
