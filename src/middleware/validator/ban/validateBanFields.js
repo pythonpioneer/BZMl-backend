@@ -1,8 +1,10 @@
 // importing all requirements
-const { body } = require('express-validator');
+const { validateGameId } = require('../../../helper/utility/validateFields/gameIdField');
+const { validatePassword } = require('../../../helper/utility/validateFields/passwordField');
+
 
 // validate the gameId and password field
 exports.validateBanFields = [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-    body('password', "Enter a valid password (admin)").isLength({ min: 6, max: 18 })
+    ...validateGameId(['pugbID']),
+    ...validatePassword(['password']),
 ];

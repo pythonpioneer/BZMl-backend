@@ -1,5 +1,4 @@
 // importing all requirements
-const { body } = require('express-validator');
 const { verifyEmail, generateOtpEmail, recoverUserPassword } = require('../controllers/verify');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = require('express').Router();
