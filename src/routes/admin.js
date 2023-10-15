@@ -8,6 +8,7 @@ const { validateValidationResult } = require('../middleware/validator/validation
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
+const { validateGameId } = require('../helper/utility/validateFields/gameIdField');
 const { validateBooleanOnly } = require('../helper/utility/validateFields/booleanOnlyField');
 const router = express.Router();
 
@@ -38,22 +39,10 @@ router.delete('/delete-the-user', validatePassword(['password']), validateValida
 router.delete('/delete-the-admin', validatePassword(['password']), validateValidationResult, fetchUser, deleteAnyAdmin);
 
 // Route 9: To get the user by user-id (only admin access): '/bzml/api/v1/admin/get-the-user' [using GET] (login required)
-router.get('/get-the-user', [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-],
-    validateValidationResult,
-    fetchUser,
-    getTheUser
-);
+router.get('/get-the-user', validateGameId(['pubgID'], false), validateValidationResult, fetchUser, getTheUser);
 
 // Route 10: To get the player by user-id (only admin access): '/bzml/api/v1/admin/get-the-player' [using GET] (login required)
-router.get('/get-the-player', [
-    body('pubgID', 'Enter your PUBG/BGMI ID').isNumeric().isLength({ min: 9, max: 12 }),
-],
-    validateValidationResult,
-    fetchUser,
-    getThePlayer
-);
+router.get('/get-the-player', validateGameId(['pubgID'], false), validateValidationResult, fetchUser, getThePlayer);
 
 // Route 11: To update the logged in admin's password (only admin access): '/bzml/api/v1/admin/update-password' [using PATCH] (login required)
 router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']), validateValidationResult, fetchUser, updatePassword);
