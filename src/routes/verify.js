@@ -6,12 +6,13 @@ const router = require('express').Router();
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
+const { validateOtp } = require('../helper/utility/validateFields/otpField');
 
 
 // validation array to validate OTP 
 const _validateFields = [
     ...validateEmail(['email']),
-    body('otp', 'Enter Valid OTP').isNumeric().isLength({ min: 6, max: 6 }),
+    ...validateOtp(['otp']),
 ];
 
 // Route 1: To generate otp for email verification: '/bzml/api/v1/verify/generate-email-otp' [using POST] (login required) 
