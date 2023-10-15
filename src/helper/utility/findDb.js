@@ -2,8 +2,6 @@
 const User = require('../../models/user/User');
 const Admin = require('../../models/user/Admin');
 
-
-
 /**
  * find field/record in database
  * @param {Object} record - It takes a field and find the field in db
