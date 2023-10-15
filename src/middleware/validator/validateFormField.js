@@ -1,6 +1,5 @@
 // importing all requirements
 const { body } = require('express-validator');
-const { findRecord } = require('../../helper/utility/findDb');
 const { validatePassword } = require('../../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../../helper/utility/validateFields/emailField');
 const { validateGameName } = require('../../helper/utility/validateFields/gameNameField');

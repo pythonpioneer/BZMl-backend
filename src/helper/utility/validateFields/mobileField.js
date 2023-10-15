@@ -1,5 +1,6 @@
 // importing all requirements
 const { check } = require('express-validator');
+const { findRecord } = require('../findDb');
 
 /**
  * This method is only used to validate the mobile fields.
