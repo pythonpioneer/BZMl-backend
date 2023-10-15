@@ -8,6 +8,7 @@ const { validateFullName } = require('../../helper/utility/validateFields/fullNa
 const { validateMobile } = require('../../helper/utility/validateFields/mobileField');
 const { validateGender } = require('../../helper/utility/validateFields/genderField');
 const { validateGameId } = require('../../helper/utility/validateFields/gameIdField');
+const { validateRefcode } = require('../../helper/utility/validateFields/referralCodeField');
 
 
 // validate basic fields, which get duplicated in validateRetistration fields and in validateUpdation fields
@@ -23,7 +24,7 @@ const _validateBaseFields = [  // add fields that can be updated only
 const _validateMoreFields = [  // add fields that can not be updated
     ...validateGameId(['pubgID'], false, { checkInDb: true, modelName: 'User'}),
     ...validatePassword(['password']),
-    body('refCode', 'Enter refral code (not required)').isLength({ max: 50 }),
+    ...validateRefcode(['refCode'], true),  // making this field optional
 ];
 
 // A validation array to validate user input field for registration
@@ -49,10 +50,5 @@ exports.validateUpdationField = _validateBaseFields.map((validationRule) => {  /
 
 // validating referral code 
 exports.validateRefCode = [
-    body('myRefCode')
-        .isLength({ min: 1, max: 30})
-        .isAlphanumeric()
-        .custom(value => !/\s/.test(value)) // removing all white spaces
-        .withMessage('Enter a valid ref code (without spaces)')
-        .custom(async (myRefCode) => await findRecord('User', { myRefCode })),
+    ...validateRefcode(['myRefCode'], false, { checkInDb: true, modelName: User })
 ];
