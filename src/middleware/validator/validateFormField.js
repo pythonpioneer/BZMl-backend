@@ -4,14 +4,16 @@ const { findRecord } = require('../../helper/utility/findDb');
 const { validatePassword } = require('../../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../../helper/utility/validateFields/emailField');
 const { validateGameName } = require('../../helper/utility/validateFields/gameNameField');
+const { validateFullName } = require('../../helper/utility/validateFields/fullNameField');
+const { validateMobile } = require('../../helper/utility/validateFields/mobileField');
 
 
 // validate basic fields, which get duplicated in validateRetistration fields and in validateUpdation fields
 const _validateBaseFields = [  // add fields that can be updated only
     ...validateGameName(['pubgName'], false, { checkInDb: true, modelName: 'User' }),
-    body('fullName', 'Enter a valid full name').isLength({ min: 3, max: 25 }),
+    ...validateFullName(['fullName']),
     ...validateEmail(['email'], false, { checkInDb: true, modelName: 'User' }),
-    body('mobileNumber', 'Enter a valid mobile number').isNumeric().isLength({ min: 10, max: 10 }).custom(async (mobileNumber) => await findRecord('User', { mobileNumber })),
+    ...validateMobile(['mobileNumber'], false, { checkInDb: true, modelName: 'User'}),
     body('gender', 'Enter gender initials').isAlpha().isLength({ min: 1, max: 1 }),
 ];
 
