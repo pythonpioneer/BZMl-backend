@@ -1,7 +1,6 @@
 // importing requirements
 const express = require('express');
 const router = express.Router();
-const { body } = require('express-validator');
 const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers, unblockPlayer } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validateBanFields } = require('../middleware/validator/ban/validateBanFields');
