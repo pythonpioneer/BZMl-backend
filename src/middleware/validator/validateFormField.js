@@ -1,5 +1,5 @@
 // importing all requirements
-const { body } = require('express-validator');
+const { check } = require('express-validator');
 const { validatePassword } = require('../../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../../helper/utility/validateFields/emailField');
 const { validateGameName } = require('../../helper/utility/validateFields/gameNameField');
@@ -38,7 +38,7 @@ exports.validateRegistrationField = [
 
 // A validation array to validate user input field for login
 exports.validateLoginField = [
-    body('userfield', 'enter valid mobileNumber/email to login').isLength({ min: 9, max: 50 }),
+    check('userfield', 'enter valid mobileNumber/email to login').isLength({ min: 9, max: 50 }),
     ...validatePassword(['password']),
 ];
 
@@ -50,4 +50,10 @@ exports.validateUpdationField = _validateBaseFields.map((validationRule) => {  /
 // validating referral code 
 exports.validateRefCode = [
     ...validateRefcode(['myRefCode'], false, { checkInDb: true, modelName: 'User' })
+];
+
+// validating player stats field
+exports.validatingPlayerStatsType = [
+    check('stats-type', "Enter a valid stats type (season | overall | solo | duo | squad)").isString()
+        .custom(value => ['season', 'overall', 'solo', 'duo', 'squad'].includes(value?.toLowerCase())).isLength({ min: 3 }),
 ];

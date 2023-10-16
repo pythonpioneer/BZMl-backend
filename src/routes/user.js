@@ -4,7 +4,7 @@ const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword, getPlayerDetails } = require('../controllers/user');
 
 // to validate input fields
-const { validateUpdationField, validateRefCode } = require('../middleware/validator/validateFormField');
+const { validateUpdationField, validateRefCode, validatingPlayerStatsType } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
@@ -29,8 +29,8 @@ router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']
 // Route 8: To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using POST] (login not required)
 router.post('/recover-password', validateEmail(['email']), validateValidationResult, recoverPassword);
 
-// Route 9: To get the player details: '/bzml/api/v1/user/getplayer' [using GET] (login required)
-router.get('/getplayer', fetchUser, getPlayerDetails);
+// Route 9: To get the player details: '/bzml/api/v1/user/getplayer?stats-type=<season | overall | solo | duo | squad>' [using GET] (login required)
+router.get('/getplayer', validatingPlayerStatsType, validateValidationResult, fetchUser, getPlayerDetails);
 
 
 // export router
