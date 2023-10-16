@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // creating schema for users
-const playerSchema = new Schema({
+const playerSeasonSchema = new Schema({
     pubgID: {  // the game id entered by the user
         type: String,
         required: true,
@@ -13,16 +13,6 @@ const playerSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-    },
-    isBan: {  // permanent ban, if any player try to hack the game in the match, then we will ban the user and player
-        type: Boolean,
-        default: false,
-        required: true,
-    },
-    isBlocked: {  // temporary ban, we will block all teammates of the hacker team, who were not cheating or hacking
-        type: Boolean,
-        default: false,
-        required: true,
     },
     totalMatch: {  // total matches played by player, in all mode
         type: Number,
@@ -44,8 +34,13 @@ const playerSchema = new Schema({
         default: 0,
         required: true,
     },
+    totalRating: {  // total rating earned by player in a season of (90 to 100 matches)
+        type: Number,
+        default: 0,
+        required: true,
+    }
 });
 
 // exporting the player model
-const Player = mongoose.model('player', playerSchema);
-module.exports = Player;
+const PlayerSeason = mongoose.model('player-season-stats', playerSeasonSchema);
+module.exports = PlayerSeason;
