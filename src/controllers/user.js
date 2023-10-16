@@ -1,9 +1,11 @@
-// importing all requirements
+// importing db models
 const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
 const RecoverPassword = require('../models/verfiy/RecoverPass');
+
+// importing other requirements
 const { sendMail } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
 const { isNumber } = require('../helper/utility/fieldIdentifier');

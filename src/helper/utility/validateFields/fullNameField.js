@@ -3,9 +3,9 @@ const { check } = require('express-validator');
 
 /**
  * This method is only used to validate the name fields.
- * @param {array} names - This method takes an array of names as input.
- * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @returns {array} - It returns validation array to validate name fields.
+ * @param {Array} names - This method takes an array of names as input.
+ * @param {Boolean} isOptional - Provide optional as true, if want the validation array to become optional.
+ * @returns {Array} - It returns validation array to validate name fields.
  */
 const validateFullName = (names, isOptional) => {
 

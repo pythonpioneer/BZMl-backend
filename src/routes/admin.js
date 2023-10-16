@@ -1,17 +1,17 @@
 // importing all requirements
-const express = require('express');
-const { body } = require('express-validator');
+const router = require('express').Router();
 const { createAdmin, loginAdmin, getAdminDetails, deleteAdmin, getAllUsers, getAllAdmins, deleteAnyUser, deleteAnyAdmin, getTheUser, getThePlayer, updatePassword, recoverPassword, verifyPlayer } = require('../controllers/admin');
+const { fetchUser } = require('../middleware/auth/authMiddleware');
+
+// to validate input fields
+const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validateRegField } = require('../middleware/validator/admin/validateAdminField');
 const { validateLoginField } = require('../middleware/validator/validateFormField');
-const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
-const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
 const { validateGameId } = require('../helper/utility/validateFields/gameIdField');
 const { validateBooleanOnly } = require('../helper/utility/validateFields/booleanOnlyField');
 const { validateMongoId } = require('../helper/utility/validateFields/mongoFields');
-const router = express.Router();
 
 
 /* Creating routes for CRUD operations on Admins. */

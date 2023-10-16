@@ -4,9 +4,9 @@ const { check } = require('express-validator');
 
 /**
  * This method is only used to validate the password fields.
- * @param {array} passwordNames - This method takes an array of password-names as input.
- * @param {boolean} isOptional - provide optional as true, if want the validation array to become optional
- * @returns {array} - It returns validation array to validate password fields
+ * @param {Array} passwordNames - This method takes an array of password-names as input.
+ * @param {Boolean} isOptional - provide optional as true, if want the validation array to become optional
+ * @returns {Array} - It returns validation array to validate password fields
  */
 const validatePassword = (passwordNames, isOptional) => {  // the password names can contain many password name
 

@@ -1,15 +1,16 @@
 // importing requirements
-const express = require('express');
-const { body } = require('express-validator');
+const router = require('express').Router();
 const { fetchUser } = require('../middleware/auth/authMiddleware');
 const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword } = require('../controllers/user');
+
+// to validate input fields
 const { validateUpdationField, validateRefCode } = require('../middleware/validator/validateFormField');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
-const router = express.Router();
 
 
+// this is the route continution from "auth.js"
 // Route 3: To get logged in user detail: '/bzml/api/v1/user/getuser' [using GET] (login required)
 router.get('/getuser', fetchUser, getUserDetails);
 

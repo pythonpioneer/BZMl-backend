@@ -4,10 +4,10 @@ const { findRecord } = require('../findDb');
 
 /**
  * This method is only used to validate the mobile fields.
- * @param {array} mobNumbers - This method takes an array of mobile numbers as input.
- * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @param {object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
- * @returns {array} - It returns validation array to validate mobile fields.
+ * @param {Array} mobNumbers - This method takes an array of mobile numbers as input.
+ * @param {Boolean} isOptional - Provide optional as true, if want the validation array to become optional.
+ * @param {Object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
+ * @returns {Array} - It returns validation array to validate mobile fields.
  */
  const validateMobile = (mobNumbers, isOptional, object) => {
 

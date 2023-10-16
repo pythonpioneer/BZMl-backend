@@ -1,10 +1,12 @@
-// importing all requirements
+// importing db models
 const User = require('../models/user/User');
 const Admin = require('../models/user/Admin');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
+const RecoverPassword = require('../models/verfiy/RecoverPass');
+
+// importing other requirements
 const { generateOtp } = require('../helper/utility/generate');
 const { sendMail } = require('../helper/utility/sendMail');
-const RecoverPassword = require('../models/verfiy/RecoverPass');
 const { generatePassword } = require('../middleware/auth/passwordMiddleware');
 const { otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
 const { notifyPasswordUpdation } = require('../helper/utility/emailTemplates/emailTemp');

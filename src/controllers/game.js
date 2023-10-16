@@ -1,4 +1,4 @@
-// Imporiting all requirements
+// Imporiting db models
 const Admin = require("../models/user/Admin");
 const User = require("../models/user/User");
 const Game = require("../models/games/Game");

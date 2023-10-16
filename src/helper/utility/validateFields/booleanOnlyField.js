@@ -3,9 +3,9 @@ const { check } = require('express-validator');
 
 /**
  * This method is only used to validate the boolean only fields.
- * @param {array} bools - This method takes an array of boolean-names as input.
- * @param {boolean} isOptional - provide optional as true, if want the validation array to become optional
- * @returns {array} - It returns validation array to validate boolean Only fields
+ * @param {Array} bools - This method takes an array of boolean-names as input.
+ * @param {Boolean} isOptional - provide optional as true, if want the validation array to become optional
+ * @returns {Array} - It returns validation array to validate boolean Only fields
  */
 const validateBooleanOnly = (bools, isOptional) => {
 
