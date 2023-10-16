@@ -33,6 +33,10 @@ const soloStatsSchema = new Schema({
         type: Number,
         default: 0,
         required: true,
+    },
+    maxPlayerAllowed: {  // total player allowed in a team
+        type: Number,
+        default: 1,
     }
 });
 
