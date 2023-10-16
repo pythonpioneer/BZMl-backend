@@ -1,7 +1,7 @@
 // importing requirements
 const router = require('express').Router();
 const { fetchUser } = require('../middleware/auth/authMiddleware');
-const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword } = require('../controllers/user');
+const { getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword, getPlayerDetails } = require('../controllers/user');
 
 // to validate input fields
 const { validateUpdationField, validateRefCode } = require('../middleware/validator/validateFormField');
@@ -26,8 +26,12 @@ router.patch('/refcode', validateRefCode, validateValidationResult, fetchUser, g
 // Route 7: To update the logged in user's password: '/bzml/api/v1/user/update-password' [using PATCH] (login required)
 router.patch('/update-password', validatePassword(['oldPassword', 'newPassword']), validateValidationResult, fetchUser, updatePassword);
 
-// Route 8; To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using POST] (login not required)
+// Route 8: To recover the user's forgotten password: '/bzml/api/v1/user/recover-password' [using POST] (login not required)
 router.post('/recover-password', validateEmail(['email']), validateValidationResult, recoverPassword);
+
+// Route 9: To get the player details: '/bzml/api/v1/user/getplayer' [using GET] (login required)
+router.get('/getplayer', fetchUser, getPlayerDetails);
+
 
 // export router
 module.exports = router;

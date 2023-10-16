@@ -351,9 +351,28 @@ const recoverPassword = async (req, res) => {
                 issue: err
             }));
 
-    } catch (err) {   // any unrecogonize error will be raised from here
+    } catch (err) {  // any unrecogonize error will be raised from here
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };
 
-module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword };
+// to get the player details
+const getPlayerDetails = async (req, res) => {
+    try {
+        // find the user 
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "User not Found!!" });
+
+        // now, fin the player data
+        let player = await Player.find({ pubgID: user.pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
+
+        // send the player data
+        res.status(200).json({ status: 200, message: "Player Found!", player: player });
+        
+    } catch (err) {  // any unrecogonize error will be raised from here
+        return res.status(500).json({ errors: "Internal server error", issue: err });
+    }
+};
+
+module.exports = { createUser, loginUser, getUserDetails, setUserDetails, deleteUserAccount, generateRef, updatePassword, recoverPassword, getPlayerDetails };
