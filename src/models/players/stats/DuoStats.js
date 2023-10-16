@@ -49,7 +49,7 @@ const duoStatsSchema = new Schema({
         default: 0,
         required: true,
     },
-    duoMaxPlayerAllowed: {  // total player allowed in a team
+    maxPlayerAllowed: {  // total player allowed in a team
         type: Number,
         default: 2,
     }

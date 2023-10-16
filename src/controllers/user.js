@@ -4,6 +4,10 @@ const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
 const EmailVerification = require('../models/verfiy/VerifyEmail');
 const RecoverPassword = require('../models/verfiy/RecoverPass');
+const PlayerSeason = require('../models/players/stats/seasonStats');
+const SoloStats = require('../models/players/stats/SoloStats');
+const DuoStats = require('../models/players/stats/DuoStats');
+const SquadStats = require('../models/players/stats/SquadStats');
 
 // importing other requirements
 const { sendMail } = require('../helper/utility/sendMail');
@@ -62,6 +66,27 @@ const createUser = async (req, res) => {
                 pubgName: user.pubgName,
             })
                 .then(async (player) => {
+
+                    // also, create the season stats for the current season
+                    await PlayerSeason.create({
+                        pubgID: user.pubgID,
+                        pubgName: user.pubgName,
+                    });
+
+                    // create the solo stats for the current season
+                    await SoloStats.create({
+                        pubgID: user.pubgID,
+                    });
+
+                    // create the duo stats for the current season
+                    await DuoStats.create({
+                        pubgID: user.pubgID,
+                    });
+
+                    // create the squad stats for the current season
+                    await SquadStats.create({
+                        pubgID: user.pubgID,
+                    });
 
                     // generate otp 
                     const otp = generateOtp();
@@ -360,21 +385,59 @@ const recoverPassword = async (req, res) => {
 const getPlayerDetails = async (req, res) => {
     try {
         // fetch the query param
-        const stasType = req.query['stats-type'];
+        const statsType = req.query['stats-type'];
+
+        // find the user 
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "User not Found!!" });
+
+        let player;
 
         // fetch the overall stats
-        if (stasType === 'overall') {
+        if (statsType === 'overall') {
 
-            // find the user 
-            let user = await User.findById(req.user.id);
-            if (!user) return res.status(404).json({ status: 404, message: "User not Found!!" });
-
-            // now, fin the player data
-            let player = await Player.find({ pubgID: user.pubgID });
+            // now, find the player data
+            player = await Player.find({ pubgID: user.pubgID });
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Player Found!", player: player });
+            res.status(200).json({ status: 200, message: "Overall Player Stats!", player: player });
+        }
+        else if (statsType === 'season') {  // fetch the current season stats
+
+            // now, find the season player stats
+            player = await PlayerSeason.find({ pubgID: user.pubgID });
+            if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
+
+            // send the player data
+            res.status(200).json({ status: 200, message: "Season Player Stats!", player: player });
+        }
+        else if (statsType === 'solo') {  // fetch the current season solo stats
+
+            // now, find the season player stats
+            player = await SoloStats.find({ pubgID: user.pubgID });
+            if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
+
+            // send the player data
+            res.status(200).json({ status: 200, message: "Solo Player Stats!", player: player });
+        }
+        else if (statsType === 'duo') {  // fetch the current season duo stats
+
+            // now, find the season player stats
+            player = await DuoStats.find({ pubgID: user.pubgID });
+            if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
+
+            // send the player data
+            res.status(200).json({ status: 200, message: "Duo Player Stats!", player: player });
+        }
+        else if (statsType === 'squad') {  // fetch the current season squad stats
+
+            // now, find the season player stats
+            player = await SquadStats.find({ pubgID: user.pubgID });
+            if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
+
+            // send the player data
+            res.status(200).json({ status: 200, message: "Squad Player Stats!", player: player });
         }
         else {  // if the stat-type is not valid (already validated by validation middlwares)
             return res.status(404).json({ status: 404, message: "Invalid query!!" });

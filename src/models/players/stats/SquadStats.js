@@ -49,7 +49,7 @@ const squadStatsSchema = new Schema({
         default: 0,
         required: true,
     },
-    squadMaxPlayerAllowed: {  // total player allowed in a team
+    maxPlayerAllowed: {  // total player allowed in a team
         type: Number,
         default: 4,
     }
