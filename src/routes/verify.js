@@ -1,8 +1,10 @@
 // importing all requirements
-const { verifyEmail, generateOtpEmail, recoverUserPassword } = require('../controllers/verify');
-const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const router = require('express').Router();
 const { fetchUser } = require('../middleware/auth/authMiddleware');
+const { verifyEmail, generateOtpEmail, recoverUserPassword } = require('../controllers/verify');
+
+// to validate input fields
+const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validatePassword } = require('../helper/utility/validateFields/passwordField');
 const { validateEmail } = require('../helper/utility/validateFields/emailField');
 const { validateOtp } = require('../helper/utility/validateFields/otpField');

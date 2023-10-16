@@ -1,10 +1,12 @@
 // importing requirements
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const { banPlayer, getBanPlayers, unbanPlayer, blockPlayer, getBlockPlayers, unblockPlayer } = require('../controllers/ban');
 const { fetchUser } = require('../middleware/auth/authMiddleware');
+
+// to validate input fields
 const { validateBanFields } = require('../middleware/validator/ban/validateBanFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
+
 
 // Route 1: To ban a user (admin access only): '/bzml/api/v1/ban/ban-player' [using POST] (login required)
 router.post('/ban-player', validateBanFields, validateValidationResult, fetchUser, banPlayer);

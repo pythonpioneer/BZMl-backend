@@ -1,8 +1,10 @@
-// Importing all requirements
+// Importing db models
 const Admin = require('../models/user/Admin');
 const User = require('../models/user/User');
 const Ban = require('../models/players/Ban');
 const Player = require('../models/players/Player');
+
+// importing other requirements
 const { comparePassword } = require('../middleware/auth/passwordMiddleware');
 
 

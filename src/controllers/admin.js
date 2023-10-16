@@ -1,14 +1,17 @@
-// importing all requirements
-const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
-const { generateToken } = require('../middleware/auth/authMiddleware');
-const { isNumber } = require('../helper/utility/fieldIdentifier');
+// importing db models
 const User = require('../models/user/User');
 const Admin = require('../models/user/Admin');
 const Player = require('../models/players/Player');
 const RecoverPassword = require('../models/verfiy/RecoverPass');
+
+// importing other requirements
+const { generatePassword, comparePassword } = require('../middleware/auth/passwordMiddleware');
+const { generateToken } = require('../middleware/auth/authMiddleware');
+const { isNumber } = require('../helper/utility/fieldIdentifier');
 const { notifyPasswordUpdation, otpEmailTemplate } = require('../helper/utility/emailTemplates/emailTemp');
 const { sendMail } = require('../helper/utility/sendMail');
 const { generateOtp } = require('../helper/utility/generate');
+
 
 // to create admins
 const createAdmin = async (req, res) => {

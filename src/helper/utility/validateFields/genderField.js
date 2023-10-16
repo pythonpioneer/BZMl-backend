@@ -3,9 +3,9 @@ const { check } = require('express-validator');
 
 /**
  * This method is only used to validate the gender fields (contain only initials =>( M | F | O)).
- * @param {array} genders - This method takes an array of gender as input.
- * @param {boolean} isOptional - provide optional as true, if want the validation array to become optional
- * @returns {array} - It returns validation array to validate gender fields
+ * @param {Array} genders - This method takes an array of gender as input.
+ * @param {Boolean} isOptional - provide optional as true, if want the validation array to become optional
+ * @returns {Array} - It returns validation array to validate gender fields
  */
 const validateGender = (genders, isOptional) => {
 

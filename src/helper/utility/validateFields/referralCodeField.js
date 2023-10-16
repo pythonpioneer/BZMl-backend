@@ -4,10 +4,10 @@ const { findRecord } = require('../findDb');
 
 /**
  * This method is only used to validate the referral fields.
- * @param {array} refCodes - This method takes an array of referrals as input.
- * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @param {object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
- * @returns {array} - It returns validation array to validate referrals fields.
+ * @param {Array} refCodes - This method takes an array of referrals as input.
+ * @param {Boolean} isOptional - Provide optional as true, if want the validation array to become optional.
+ * @param {Object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
+ * @returns {Array} - It returns validation array to validate referrals fields.
  */
 const validateRefcode = (refCodes, isOptional, object) => {
 

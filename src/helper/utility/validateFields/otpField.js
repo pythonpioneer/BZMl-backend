@@ -3,8 +3,8 @@ const { check } = require('express-validator');
 
 /**
  * This method is only used to validate the OTP fields.
- * @param {array} otpFields - This method takes an array of OTP input.
- * @returns {array} - It returns validation array to validate OTP fields
+ * @param {Array} otpFields - This method takes an array of OTP input.
+ * @returns {Array} - It returns validation array to validate OTP fields
  */
 const validateOtp = (otpFields, isOptional) => {
 

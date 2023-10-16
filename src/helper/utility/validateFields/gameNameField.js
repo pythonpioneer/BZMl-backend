@@ -4,10 +4,10 @@ const { findRecord } = require('../findDb');
 
 /**
  * This method is only used to validate the email fields.
- * @param {array} gameNames - This method takes an array of game-names as input.
- * @param {boolean} isOptional - Provide optional as true, if want the validation array to become optional.
- * @param {object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
- * @returns {array} - It returns validation array to validate game name fields.
+ * @param {Array} gameNames - This method takes an array of game-names as input.
+ * @param {Boolean} isOptional - Provide optional as true, if want the validation array to become optional.
+ * @param {Object} object - It contain two things, one checkInDb and the other is the model name => object: { checkInDb: True, modelName: 'User' }
+ * @returns {Array} - It returns validation array to validate game name fields.
  */
  const validateGameName = (gameNames, isOptional, object) => {
 

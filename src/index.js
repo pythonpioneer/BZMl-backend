@@ -4,8 +4,8 @@ const express = require('express');
 const cors = require("cors");
 
 // setting local variables
-const dotenv = require('dotenv');
-dotenv.config();
+const dotenv = require('dotenv').config();
+
 
 // mongo connection
 connectToMongo();

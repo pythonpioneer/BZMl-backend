@@ -1,13 +1,13 @@
 // importing all requirements
-const express = require('express');
+const router = require('express').Router();
 const { createGame, getGames, deleteGame, updateGame } = require('../controllers/game');
 const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
+
+// to validate input fields
 const { validateGameFields, validateUpdationFields } = require('../middleware/validator/game/validateGameFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validateMongoId } = require('../helper/utility/validateFields/mongoFields');
 
-// now creating router, to map all routes
-const router = express.Router();
 
 // Route 1: To create a game (only admin to access): '/bzml/api/v1/games/create-game' [using POST] (login required)
 router.post('/create-game', validateGameFields, validateValidationResult, fetchUser, createGame);
