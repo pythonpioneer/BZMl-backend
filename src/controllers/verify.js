@@ -55,11 +55,9 @@ const verifyEmail = async (req, res) => {
 // to generate email otp
 const generateOtpEmail = async (req, res) => {
     try {
-        // fetch the email from the body
-        const email = req.body?.email?.toLowerCase();
 
         // find that the user exists
-        const user = await User.findOne({ email });
+        const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ status: 404, message: "User Not Found!" });
 
         // if user is verified
@@ -69,7 +67,7 @@ const generateOtpEmail = async (req, res) => {
         const otp = generateOtp();
 
         // now, insure that the email in not in verification model
-        let emailVerification = await EmailVerification.findOne({ email });
+        let emailVerification = await EmailVerification.findOne({ email: user.email });
         if (emailVerification) {
 
             // email exists in the Email Verification model
@@ -78,7 +76,7 @@ const generateOtpEmail = async (req, res) => {
 
         // now save the otp in the verification model and send it to user
         EmailVerification.create({
-            email: email,
+            email: user.email,
             otpEmail: otp,
         })
             .then((verify) => {
