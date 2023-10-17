@@ -52,8 +52,8 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-// to generate email otp
-const generateOtpEmail = async (req, res) => {
+// to generate otp for email verification
+const generateEmailOtp = async (req, res) => {
     try {
 
         // find that the user exists
@@ -168,5 +168,10 @@ const recoverUserPassword = async (req, res) => {
     }
 };
 
+// to generate the otp for mobile verification
+const generateMobileOtp = async (req, res) => {
+    res.send("ok");
+};
+
 // export all functions
-module.exports = { verifyEmail, generateOtpEmail, recoverUserPassword };
+module.exports = { verifyEmail, generateEmailOtp, recoverUserPassword, generateMobileOtp };
