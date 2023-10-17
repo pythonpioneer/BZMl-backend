@@ -34,6 +34,5 @@ router.post('/recover-password', [
 // Route 4: To generate otp for mobile verification: '/bzml/api/v1/verify/generate-mobile-otp' [using POST] (login required) 
 router.post('/generate-mobile-otp', fetchUser, generateMobileOtp);
 
-
 // now export the router
 module.exports = router;
