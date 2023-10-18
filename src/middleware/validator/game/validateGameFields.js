@@ -1,8 +1,9 @@
 // importing all requiremnts
-const { body } = require('express-validator');
+const { check } = require('express-validator');
 const { validateGamePlatform } = require('../../../helper/utility/validateFields/gamePlatformField');
 const { validateGameMode } = require('../../../helper/utility/validateFields/gameModeField');
 const { validateMoney } = require('../../../helper/utility/validateFields/moneyField');
+const { validateGameMap } = require('../../../helper/utility/validateFields/mapField');
 
 
 // contain all game fields
@@ -16,7 +17,9 @@ const _gameFields = [
 exports.validateGameFields = [
     ...validateGamePlatform(['gamingPlatform']),
     ...validateGameMode(['gamingMode']),
+    ...validateGameMap(['gamingMap']),
     ...validateMoney(['prizePool', 'entryFee']),
+    check('gamingTitle', "enter a valid title (alpha numeric)").isAlphanumeric('en-US', { ignore: ' '}).isLength({ min: 3, max: 50 }),
 ];
 
 // validate the game fields to update the game
