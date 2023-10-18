@@ -225,5 +225,10 @@ const generateMobileOtp = async (req, res) => {
     }
 };
 
+// to verify the user mobile number using otp
+const verifyMobile = async (req, res) => {
+    res.send("ok");
+};
+
 // export all functions
-module.exports = { verifyEmail, generateEmailOtp, recoverUserPassword, generateMobileOtp };
+module.exports = { verifyEmail, generateEmailOtp, recoverUserPassword, generateMobileOtp, verifyMobile };
