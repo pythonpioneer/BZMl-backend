@@ -27,16 +27,16 @@ router.post('/email', _validateFields, validateValidationResult, verifyEmail);
 router.post('/recover-password', [
     ..._validateFields,
     ...validatePassword(['password']),
-], 
-    validateValidationResult,
-    recoverUserPassword
-);
+], validateValidationResult, recoverUserPassword);
 
 // Route 4: To generate otp for mobile verification: '/bzml/api/v1/verify/generate-mobile-otp' [using POST] (login required) 
 router.post('/generate-mobile-otp', fetchUser, generateMobileOtp);
 
 // Route 5: To verify user mobile number using OTP: '/bzml/api/v1/verify/mobile' [using POST] (login not required)
-router.post('/mobile', validateMobile(['mobileNumber']), validateValidationResult, verifyMobile);
+router.post('/mobile', [
+    ...validateMobile(['mobileNumber']),
+    ...validateOtp(['otp']),
+], validateValidationResult, verifyMobile);
 
 // now export the router
 module.exports = router;

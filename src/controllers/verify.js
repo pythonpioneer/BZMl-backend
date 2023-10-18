@@ -227,7 +227,36 @@ const generateMobileOtp = async (req, res) => {
 
 // to verify the user mobile number using otp
 const verifyMobile = async (req, res) => {
-    res.send("ok");
+    try {
+        // fetch the body and otp from the body
+        const { mobileNumber, otp } = req.body;
+
+        // now, find that the mobile number exists as user
+        let user = await User.findOne({ mobileNumber });
+        if (!user) return res.status(404).json({ status: 404, message: "User Not Found!" });
+
+        // now, confirm that the user requested for OTP
+        let mobile = await MobileVerification.findOne({ mobileNumber });
+        if (!mobile) return res.status(400).json({ status: 400, message: "You need to Generate OTP" });
+
+        // match the otp
+        if (otp != mobile.otpMobile) return res.status(400).json({ status: 400, message: "Invalid OTP" });
+
+        // now, confirm that the user is verified or not
+        if (!user.isMobileVerified) {  // now, verify the user
+            user.isMobileVerified = true;
+            user.save();
+
+            // user verified successfully
+            return res.status(200).json({ status: 200, message: "User Verified!!" });
+        }
+        else {  // user is already verified
+            return res.status(200).json({ status: 200, message: "User is already Verified!!" });
+        }
+        
+    } catch (err) {  // unreocgonized errors
+        return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
+    }
 };
 
 // export all functions
