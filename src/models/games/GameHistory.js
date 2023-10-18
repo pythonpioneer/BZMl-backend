@@ -9,6 +9,10 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gamingTitle: {
+        type: String,
+        required: true,
+    },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
         default: "BGMI",
