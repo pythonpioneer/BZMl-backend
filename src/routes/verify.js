@@ -1,7 +1,7 @@
 // importing all requirements
 const router = require('express').Router();
 const { fetchUser } = require('../middleware/auth/authMiddleware');
-const { verifyEmail, generateOtpEmail, recoverUserPassword } = require('../controllers/verify');
+const { verifyEmail, generateEmailOtp, recoverUserPassword, generateMobileOtp } = require('../controllers/verify');
 
 // to validate input fields
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
@@ -17,7 +17,7 @@ const _validateFields = [
 ];
 
 // Route 1: To generate otp for email verification: '/bzml/api/v1/verify/generate-email-otp' [using POST] (login required) 
-router.post('/generate-email-otp', validateEmail, validateValidationResult, fetchUser, generateOtpEmail);
+router.post('/generate-email-otp', fetchUser, generateEmailOtp);
 
 // Route 2: To verify user Email Address using OTP: '/bzml/api/v1/verify/email' [using POST] (login not required)
 router.post('/email', _validateFields, validateValidationResult, verifyEmail);
@@ -31,6 +31,8 @@ router.post('/recover-password', [
     recoverUserPassword
 );
 
+// Route 4: To generate otp for mobile verification: '/bzml/api/v1/verify/generate-mobile-otp' [using POST] (login required) 
+router.post('/generate-mobile-otp', fetchUser, generateMobileOtp);
 
 // now export the router
 module.exports = router;
