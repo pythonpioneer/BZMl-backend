@@ -9,7 +9,7 @@ const GameHistory = require("../models/games/GameHistory");
 const createGame = async (req, res) => {
     try {
         // fetch all the game information from the req body
-        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, entryFee, maxPlayer } = req.body;
+        const { gamingPlatform, gamingMode, prizePool, entryFee, maxPlayer } = req.body;
 
         // now confirm the admin identity
         let admin = await Admin.findById(req.user.id);
@@ -20,8 +20,6 @@ const createGame = async (req, res) => {
             host: req.user.id,
             gamingPlatform: gamingPlatform?.toUpperCase(),
             gamingMode: gamingMode?.toUpperCase(),
-            roomId: roomId,
-            roomPass: roomPass,
             prizePool: prizePool,
             entryFee: entryFee,
             maxPlayer: maxPlayer,

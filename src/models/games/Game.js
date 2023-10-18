@@ -9,6 +9,10 @@ const gameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gamingTitle: {
+        type: String,
+        required: true,
+    },
     gamingPlatform: {  // ( BGMI | PUBG )
         type: String,
         default: "BGMI",
@@ -18,13 +22,15 @@ const gameSchema = new Schema({
         type: String,
         required: true,
     },
+    gamingMap: {  // ( ERANGEL | NUSA | SANHOK | KARAKIN | MIRAMAR | LIVIK | VIKENDI )
+        type: String,
+        required: true,
+    },
     roomId: {
         type: String,
-        required: true
     },
     roomPass: {
         type: String,
-        required: true,
     },
     prizePool: {
         type: Number,
