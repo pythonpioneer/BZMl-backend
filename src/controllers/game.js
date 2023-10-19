@@ -9,7 +9,7 @@ const GameHistory = require("../models/games/GameHistory");
 const createGame = async (req, res) => {
     try {
         // fetch all the game information from the req body
-        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, entryFee, maxPlayer } = req.body;
+        const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee, maxPlayer } = req.body;
 
         // now confirm the admin identity
         let admin = await Admin.findById(req.user.id);
@@ -18,10 +18,10 @@ const createGame = async (req, res) => {
         // now, create the game
         Game.create({
             host: req.user.id,
+            gamingTitle: gamingTitle.toUpperCase(),
             gamingPlatform: gamingPlatform?.toUpperCase(),
             gamingMode: gamingMode?.toUpperCase(),
-            roomId: roomId,
-            roomPass: roomPass,
+            gamingMap: gamingMap.toUpperCase(),
             prizePool: prizePool,
             entryFee: entryFee,
             maxPlayer: maxPlayer,
@@ -30,9 +30,10 @@ const createGame = async (req, res) => {
                 // now push the game data into game history
                 GameHistory.create({
                     host: req.user.id,
-                    gameId: game._id,
+                    gamingTitle: game.gamingTitle,
                     gamingPlatform: game.gamingPlatform,
                     gamingMode: game.gamingMode,
+                    gamingMap: game.gamingMap,
                     prizePool: prizePool,
                     entryFee: entryFee,
                 })
@@ -192,7 +193,7 @@ const deleteGame = async (req, res) => {
 const updateGame = async (req, res) => {
     try {
         // fetch all the values from request body
-        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, entryFee } = req.body;
+        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, gamingMap } = req.body;
         let toBeUpdated = false;  // if any field given to update
 
         // now, create a new game object
@@ -201,11 +202,15 @@ const updateGame = async (req, res) => {
         // now, find and fill all the field to be updated
         if (gamingPlatform) {
             toBeUpdated = true;
-            newGame.gamingPlatform = gamingPlatform;
+            newGame.gamingPlatform = gamingPlatform.toUpperCase();
+        }
+        if (gamingMap) {
+            toBeUpdated = true;
+            newGame.gamingMap = gamingMap.toUpperCase();
         }
         if (gamingMode) {
             toBeUpdated = true;
-            newGame.gamingMode = gamingMode;
+            newGame.gamingMode = gamingMode.toUpperCase();
         }
         if (roomId) {
             toBeUpdated = true;

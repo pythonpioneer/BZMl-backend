@@ -9,9 +9,8 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
-    gameId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'game',
+    gamingTitle: {
+        type: String,
         required: true,
     },
     gamingPlatform: {  // ( BGMI | PUBG )
@@ -20,6 +19,10 @@ const previousGameSchema = new Schema({
         required: true,
     },
     gamingMode: {  // ( SOLO | DUO | SQUAD )
+        type: String,
+        required: true,
+    },
+    gamingMap: {  // ( ERANGEL | NUSA | SANHOK | KARAKIN | MIRAMAR | LIVIK | VIKENDI )
         type: String,
         required: true,
     },
