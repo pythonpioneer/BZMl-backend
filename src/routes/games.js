@@ -1,6 +1,6 @@
 // importing all requirements
 const router = require('express').Router();
-const { createGame, getGames, deleteGame, updateGame, registerInGame } = require('../controllers/game');
+const { createGame, getGames, deleteGame, updateGame, registerInSoloGame } = require('../controllers/game');
 const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
 
 // to validate input fields
@@ -25,7 +25,7 @@ router.put('/update-game', [
 ],  validateValidationResult, fetchUser, updateGame);
 
 // Route 5: To register in the game: '/bzml/api/v1/games/register' [using PATCH] (login required)
-router.patch('/register-solo', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInGame);
+router.patch('/register-solo', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInSoloGame);
 
 // export the router
 module.exports = router;

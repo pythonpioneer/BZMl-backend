@@ -9,6 +9,11 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game',
+        required: true,
+    },
     gamingTitle: {
         type: String,
         required: true,
@@ -35,9 +40,8 @@ const previousGameSchema = new Schema({
         required: true,
     },
     players: [{   // array of players object id
-        type: mongoose.Schema.Types.ObjectId, 
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Player',
-        unique: true, 
     }],
     deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
