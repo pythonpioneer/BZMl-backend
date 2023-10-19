@@ -9,6 +9,11 @@ const previousGameSchema = new Schema({
         ref: 'Admin',
         required: true,
     },
+    gameId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game',
+        required: true,
+    },
     gamingTitle: {
         type: String,
         required: true,
@@ -34,11 +39,10 @@ const previousGameSchema = new Schema({
         type: Number,
         required: true,
     },
-    totalPlayers: {
-        type: Number,
-        default: 0,  // update this field when game started (isGameStarted=true)
-        required: true,
-    },
+    players: [{   // array of players object id
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Player',
+    }],
     deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
     },

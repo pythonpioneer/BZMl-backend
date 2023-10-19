@@ -47,7 +47,7 @@ const gameSchema = new Schema({
     },
     maxPlayers: {
         type: Number,
-        default: 100,
+        default: 92,
         required: true,
     },
     isGameStarted: {
@@ -55,9 +55,29 @@ const gameSchema = new Schema({
         default: false,
         required: true,
     },
-    timeStamp: {  // after 3 hrs, the record will be deleted
+    players: [{   // array of players object id
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Player',
+    }],
+    slots: [
+        {
+            player: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Player'
+            },
+            slotNumber: {
+                type: Number
+            }
+        }
+    ],
+    availableSlots: {
+        type: [Number], // This specifies that the array contains numbers
+        default: Array.from({ length: 100 - 8 }, (_, index) => index + 9), // You can provide a default array of available slots
+        required: true, // You can make the field required if needed
+    },
+    timeStamp: {  // after 24 hrs, the record will be deleted
         type: Date,
-        expires: 10800,  
+        expires: 86400,
         default: Date.now,
     }
 });

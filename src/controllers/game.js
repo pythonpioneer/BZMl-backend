@@ -2,6 +2,7 @@
 const Admin = require("../models/user/Admin");
 const User = require("../models/user/User");
 const Game = require("../models/games/Game");
+const Player = require("../models/players/Player");
 const GameHistory = require("../models/games/GameHistory");
 
 
@@ -9,7 +10,7 @@ const GameHistory = require("../models/games/GameHistory");
 const createGame = async (req, res) => {
     try {
         // fetch all the game information from the req body
-        const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee, maxPlayer } = req.body;
+        const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee, maxPlayers } = req.body;
 
         // now confirm the admin identity
         let admin = await Admin.findById(req.user.id);
@@ -24,12 +25,13 @@ const createGame = async (req, res) => {
             gamingMap: gamingMap.toUpperCase(),
             prizePool: prizePool,
             entryFee: entryFee,
-            maxPlayer: maxPlayer,
+            maxPlayers: maxPlayers,
         })
             .then((game) => {
                 // now push the game data into game history
                 GameHistory.create({
                     host: req.user.id,
+                    gameId: game._id,
                     gamingTitle: game.gamingTitle,
                     gamingPlatform: game.gamingPlatform,
                     gamingMode: game.gamingMode,
@@ -253,6 +255,82 @@ const updateGame = async (req, res) => {
     }
 };
 
+// to register the user in the game
+const registerInSoloGame = async (req, res) => {
+    try {
+        // fetching the game id from the query params
+        const gameId = req.query['game-id'];
+
+        // check that the given user exists
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // confirm that the game exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
+
+        // if the game is not solo then return the bad response
+        if (game.gamingMode.toLowerCase() != 'solo') return res.status(403).json({ status: 403, message: "This API is for SOLO modes only." });
+
+        // now, check that the user is verified and can register in the game
+        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!"});
+
+        // now, find that the player exist
+        let player = await Player.findOne({ pubgID: user.pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "player not found!" });
+
+        // if player is not ban or not blocked then the player continues
+        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });
+
+        // now make sure there is still place for the players to join/regster in the game
+        if (game.availableSlots.length <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
+
+        // now, check that the player is not already registered
+        let isIds = game.players.filter(value => value.toString() === player._id.toString());
+
+        if (isIds.length != 0) {  // if player is already registered
+
+            // find the slot number of the registered player and return the response to the player
+            let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
+            return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber }); 
+        }
+
+        // make sure that user have sufficient cash for the match
+        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
+
+        // now generate a available slot numbers
+        let slotNumber = game.availableSlots.pop();
+        game.save();
+
+        // update the game by entering player id and slot numbers
+        game = await Game.findByIdAndUpdate(
+            gameId,
+            { $push: { slots: { player: player._id, slotNumber } } },
+            { new: true }
+        );
+
+        // now, register the user in the game
+        ++game.currPlayers;
+        game.players.push(player._id);
+        game.save();
+
+        // // now find the game in game history
+        let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+        // now, save the player in gameHistory
+        gameHistory.players.push(player._id);
+        gameHistory.save();
+
+        // now, deduct the money from the user
+        user.myCash -= game.entryFee;
+        user.save();
+
+        return res.status(200).json({ status: 200, message: "User registered in the game, Successfully!!", slotNumber });
+    } catch (err) {
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame, updateGame };
+module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame };
 
