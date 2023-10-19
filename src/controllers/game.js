@@ -253,6 +253,11 @@ const updateGame = async (req, res) => {
     }
 };
 
+// to register the user in the game
+const registerInGame = async (req, res) => {
+    res.send("ok");
+};
+
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame, updateGame };
+module.exports = { createGame, getGames, deleteGame, updateGame, registerInGame };
 
