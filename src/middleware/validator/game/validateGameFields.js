@@ -10,7 +10,10 @@ const { validateGameMap } = require('../../../helper/utility/validateFields/mapF
 const _gameFields = [
     ...validateGamePlatform(['gamingPlatform']),
     ...validateGameMode(['gamingMode']),
+    ...validateGameMap(['gamingMap']),
     ...validateMoney(['prizePool']),
+    check('roomId', "Enter valid room Id").isNumeric().isLength({ max: 10 }),
+    check('roomPass', "Enter a valid room Password").isAlphanumeric().isLength({ min: 1, max: 15 }),
 ];
 
 // validate the game fields to create game 

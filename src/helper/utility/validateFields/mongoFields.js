@@ -14,12 +14,7 @@ const validateMongoId = (mongoIds, isOptional) => {
 
     // now, validating mongo-id
     return mongoIds.map(mongoId => {
-        const validationChain = check(mongoId, `Enter a vaild ${mongoId}`).custom((id) => {
-            if (!isValidMongoObjectId(id)) {
-                throw new Error('Invalid ObjectId');
-            }
-            return true; // Return true to indicate the value is valid
-        });
+        const validationChain = check(mongoId, `Enter a vaild ${mongoId}`).isMongoId()
 
         // making this field optional
         if (isOptional) validationChain.optional();
