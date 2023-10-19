@@ -28,7 +28,10 @@ const createUser = async (req, res) => {
 
     // fields to update user data
     let cash = 0;
-    cash = 50;
+
+    // find that the user is trying to re-register or not
+    let user = await Player.findOne({ pubgID: req.body.pubgID });
+    if (!user) cash = 50;  // if user is registering for the first time.
 
     // create the user in db
     User.create({
