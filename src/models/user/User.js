@@ -80,6 +80,10 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    referredUsers: [{   // array of user's id referred by the user
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User' 
+    }],
     timestamp: {
         type: Date,
         default: Date.now,

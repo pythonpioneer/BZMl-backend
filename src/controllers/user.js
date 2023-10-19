@@ -28,19 +28,7 @@ const createUser = async (req, res) => {
 
     // fields to update user data
     let cash = 0;
-
-    // find the ref-id
-    if (req?.body?.refCode) {
-        let refUser = await User.findOne({ myRefCode: req?.body?.refCode });
-
-        // if user will be there then update
-        if (refUser) {
-            // if reffered user exist then
-            refUser.myCash += 50;
-            cash = 50;
-            refUser.save();
-        }
-    }
+    cash = 50;
 
     // create the user in db
     User.create({
@@ -59,6 +47,21 @@ const createUser = async (req, res) => {
             // now, check that the player is known to us (verify the problem at issue #103)
             let newPlayer = await Player.findOne({ pubgID: req.body.pubgID });
             if (newPlayer) return res.status(201).json({ "status": 201, "message": "user created", "info": "Verify Your Email Address" });
+
+            // find the ref-id
+            if (req?.body?.refCode) {
+                let refUser = await User.findOne({ myRefCode: req?.body?.refCode });
+
+                // if user will be there then update
+                if (refUser) {
+                    // if reffered user exist then
+                    refUser.myCash += 50;
+
+                    // add the current user name in referred list
+                    refUser.referredUsers.push(user._id);
+                    await refUser.save();
+                }
+            }
 
             // now, create a player
             Player.create({
@@ -295,7 +298,7 @@ const generateRef = async (req, res) => {
 
 // to update the password of users
 const updatePassword = async (req, res) => {
-    try {  
+    try {
         // fetch the passwords from the request body
         const { oldPassword, newPassword } = req.body;
 
@@ -328,7 +331,7 @@ const updatePassword = async (req, res) => {
 
         // user's password updated
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
-        
+
     } catch (err) {
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
@@ -442,7 +445,7 @@ const getPlayerDetails = async (req, res) => {
         else {  // if the stat-type is not valid (already validated by validation middlwares)
             return res.status(404).json({ status: 404, message: "Invalid query!!" });
         }
-        
+
     } catch (err) {  // any unrecogonize error will be raised from here
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
