@@ -34,11 +34,11 @@ const previousGameSchema = new Schema({
         type: Number,
         required: true,
     },
-    totalPlayers: {
-        type: Number,
-        default: 0,  // update this field when game started (isGameStarted=true)
-        required: true,
-    },
+    players: [{   // array of players object id
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Player',
+        unique: true, 
+    }],
     deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
     },

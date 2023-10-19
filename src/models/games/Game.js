@@ -58,7 +58,6 @@ const gameSchema = new Schema({
     players: [{   // array of players object id
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Player',
-        unique: true, 
     }],
     timeStamp: {  // after 24 hrs, the record will be deleted
         type: Date,

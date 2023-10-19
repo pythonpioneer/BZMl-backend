@@ -257,9 +257,16 @@ const updateGame = async (req, res) => {
 // to register the user in the game
 const registerInGame = async (req, res) => {
     try {
+        // fetching the game id from the query params
+        const gameId = req.query['game-id'];
+
         // check that the given user exists
         let user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // confirm that the game exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
 
         // now, check that the user is verified and can register in the game
         if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!"});
@@ -270,6 +277,25 @@ const registerInGame = async (req, res) => {
 
         // if player is not ban or not blocked then the player continues
         if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });
+
+        // now make sure there is still place for the players to join/regster in the game
+        if (game.currPlayers > game.maxPlayers) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
+
+        // make sure that user have sufficient cash for the match
+        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
+
+        // now, check that the player is not already registered
+        let isIds = game.players.filter(value => value.toString() === player._id.toString());
+        if (isIds.length != 0) return res.status(403).json({ status: 403, message: "Player is already registered!"}); 
+
+        // now, register the user in the game
+        ++game.currPlayers;
+        game.players.push(player._id);
+        game.save();
+
+        // now, deduct the money from the user
+        user.myCash -= game.entryFee;
+        user.save();
 
         res.send("ok");
     } catch (err) {

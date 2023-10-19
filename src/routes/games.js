@@ -25,7 +25,7 @@ router.put('/update-game', [
 ],  validateValidationResult, fetchUser, updateGame);
 
 // Route 5: To register in the game: '/bzml/api/v1/games/register' [using PATCH] (login required)
-router.patch('/register', fetchUser, registerInGame);
+router.patch('/register-solo', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInGame);
 
 // export the router
 module.exports = router;
