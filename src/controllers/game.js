@@ -2,6 +2,7 @@
 const Admin = require("../models/user/Admin");
 const User = require("../models/user/User");
 const Game = require("../models/games/Game");
+const Player = require("../models/players/Player");
 const GameHistory = require("../models/games/GameHistory");
 
 
@@ -255,7 +256,25 @@ const updateGame = async (req, res) => {
 
 // to register the user in the game
 const registerInGame = async (req, res) => {
-    res.send("ok");
+    try {
+        // check that the given user exists
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // now, check that the user is verified and can register in the game
+        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!"});
+
+        // now, find that the player exist
+        let player = await Player.findOne({ pubgID: user.pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "player not found!" });
+
+        // if player is not ban or not blocked then the player continues
+        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });
+
+        res.send("ok");
+    } catch (err) {
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
 };
 
 // exporting required methods
