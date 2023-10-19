@@ -18,7 +18,7 @@ const createGame = async (req, res) => {
         // now, create the game
         Game.create({
             host: req.user.id,
-            gamingTitle: gamingTitle,
+            gamingTitle: gamingTitle.toUpperCase(),
             gamingPlatform: gamingPlatform?.toUpperCase(),
             gamingMode: gamingMode?.toUpperCase(),
             gamingMap: gamingMap.toUpperCase(),
@@ -193,7 +193,7 @@ const deleteGame = async (req, res) => {
 const updateGame = async (req, res) => {
     try {
         // fetch all the values from request body
-        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, entryFee } = req.body;
+        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, gamingMap } = req.body;
         let toBeUpdated = false;  // if any field given to update
 
         // now, create a new game object
@@ -202,11 +202,15 @@ const updateGame = async (req, res) => {
         // now, find and fill all the field to be updated
         if (gamingPlatform) {
             toBeUpdated = true;
-            newGame.gamingPlatform = gamingPlatform;
+            newGame.gamingPlatform = gamingPlatform.toUpperCase();
+        }
+        if (gamingMap) {
+            toBeUpdated = true;
+            newGame.gamingMap = gamingMap.toUpperCase();
         }
         if (gamingMode) {
             toBeUpdated = true;
-            newGame.gamingMode = gamingMode;
+            newGame.gamingMode = gamingMode.toUpperCase();
         }
         if (roomId) {
             toBeUpdated = true;
