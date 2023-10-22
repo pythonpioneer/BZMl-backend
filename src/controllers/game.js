@@ -195,7 +195,7 @@ const deleteGame = async (req, res) => {
 const updateGame = async (req, res) => {
     try {
         // fetch all the values from request body
-        const { gamingPlatform, gamingMode, roomId, roomPass, prizePool, gamingMap } = req.body;
+        const { roomId, roomPass, prizePool, gamingMap, gamingTitle } = req.body;
         let toBeUpdated = false;  // if any field given to update
 
         // now, create a new game object
@@ -205,6 +205,10 @@ const updateGame = async (req, res) => {
         if (gamingMap) {
             toBeUpdated = true;
             newGame.gamingMap = gamingMap.toUpperCase();
+        }
+        if (gamingTitle) {
+            toBeUpdated = true;
+            newGame.gamingTitle = gamingTitle;
         }
         if (roomId) {
             toBeUpdated = true;
