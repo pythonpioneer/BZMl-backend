@@ -71,7 +71,7 @@ const gameSchema = new Schema({
         }
     ],
     availableSlots: {
-        type: [Number], // This specifies that the array contains numbers
+        type: [[Number]], // This specifies that the array contains numbers
         default: Array.from({ length: 100 - 8 }, (_, index) => index + 9), // You can provide a default array of available slots
         required: true, // You can make the field required if needed
     },

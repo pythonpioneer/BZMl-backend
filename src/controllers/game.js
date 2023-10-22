@@ -4,6 +4,7 @@ const User = require("../models/user/User");
 const Game = require("../models/games/Game");
 const Player = require("../models/players/Player");
 const GameHistory = require("../models/games/GameHistory");
+const { generateSlots } = require("../helper/utility/generateSlots");
 
 
 // to create a game
@@ -14,6 +15,11 @@ const createGame = async (req, res) => {
     const _livikMap = ['LIVIK'];  // max players: 52, allowed: 44
     const _karakinMap = ['KARAKIN'];  // max players: 64, allowed: 56
     const _nusaMap = ['NUSA'];  // max players: 32, allowed: 28
+
+    // to generate the available slots
+    let allowedPlayers;
+    let firstSlot;
+    let teamMembers;
 
     try {
         // fetch all the game information from the req body
@@ -33,14 +39,22 @@ const createGame = async (req, res) => {
         }
         else if (_nusaMap.includes(gamingMap.toUpperCase())) {  // setting the maximum allowed players value
             if (!maxPlayers <= 28) maxPlayers = 28;
-
-             // now, generate the available slots array 
-            availableSlots = Array.from({ length: maxPlayers }, (_, index) => index + 5)
         }
 
-        if (gamingMap.toUpperCase() != 'NUSA') {  // now, generate the available slots array 
-            availableSlots = Array.from({ length: maxPlayers }, (_, index) => index + 9)
-        }
+        // total allowed players
+        allowedPlayers = maxPlayers;
+
+        // now, find the first slot based on map
+        if (gamingMap.toUpperCase() === 'NUSA') firstSlot = 5;  // 4 slots for peoples to wait for their slots to become vaccant
+        else firstSlot = 9;  // 8 slots for peoples to wait for their slots to become vaccant
+
+        // now, set the mode of the game to generate the available slots
+        if (gamingMode.toUpperCase() === 'SOLO') teamMembers = 1;
+        else if (gamingMode.toUpperCase() === 'DUO') teamMembers = 2;
+        else if (gamingMode.toUpperCase() === 'SQUAD') teamMembers = 4;
+
+        // now, generate the available slot array
+        availableSlots = generateSlots({ allowedPlayers, teamMembers, firstSlot });
 
         // now confirm the admin identity
         let admin = await Admin.findById(req.user.id);
