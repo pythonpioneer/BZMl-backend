@@ -64,12 +64,13 @@ const getGames = async (req, res) => {
         // fetch the gametype and 
         const gameType = req.query['gametype']?.toLowerCase();
         let game;
+        let notFetched;
 
         // to get all the current game list (login not required)
         if (gameType === 'current') {
 
             // value that shouldn't be fetched (default if user is logged in as user)
-            let notFetched = ['-host'];
+            notFetched = ['-host', '-roomId', '-roomPass', '-availableSlots', '-players', '-slots'];  // add all slots fields
 
             // now, check that the user is logged in or not
             if (req?.user?.id) {  // user is logged in
@@ -87,8 +88,7 @@ const getGames = async (req, res) => {
                     else return res.status(404).json({ status: 404, message: "User Not Found" });
 
                 }
-                else notFetched = ['-host'];  // if user is logged in as user
-
+                // else do not fetch the declared fields in notFetched
             }
             else {  // user is not logged in
                 notFetched.push(...['-roomPass', '-roomId', '-currPlayers', '-isGameStarted']);  // don't fetch these values
