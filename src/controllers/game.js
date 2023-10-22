@@ -18,7 +18,8 @@ const createGame = async (req, res) => {
     try {
         // fetch all the game information from the req body
         const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee } = req.body;
-        let maxPlayers = req.body.maxPlayers;        
+        let maxPlayers = req.body.maxPlayers;
+        let availableSlots;  // to generate the slot array based on maps        
 
         // now, figure out the max limit of the players in the particular maps ( ERANGEL_100 | NUSA_32 | SANHOK_100 | KARAKIN_64 | MIRAMAR_100 | LIVIK_52 | VIKENDI_100 )
         if (_fullCapacityMaps.includes(gamingMap.toUpperCase())) {
@@ -32,6 +33,13 @@ const createGame = async (req, res) => {
         }
         else if (_nusaMap.includes(gamingMap.toUpperCase())) {  // setting the maximum allowed players value
             if (!maxPlayers <= 28) maxPlayers = 28;
+
+             // now, generate the available slots array 
+            availableSlots = Array.from({ length: maxPlayers }, (_, index) => index + 5)
+        }
+
+        if (gamingMap.toUpperCase() != 'NUSA') {  // now, generate the available slots array 
+            availableSlots = Array.from({ length: maxPlayers }, (_, index) => index + 9)
         }
 
         // now confirm the admin identity
@@ -48,6 +56,7 @@ const createGame = async (req, res) => {
             prizePool: prizePool,
             entryFee: entryFee,
             maxPlayers: maxPlayers,
+            availableSlots: availableSlots,
         })
             .then((game) => {
                 // now push the game data into game history
