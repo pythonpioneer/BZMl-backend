@@ -202,17 +202,9 @@ const updateGame = async (req, res) => {
         let newGame = { timeStamp: Date.now() };
 
         // now, find and fill all the field to be updated
-        if (gamingPlatform) {
-            toBeUpdated = true;
-            newGame.gamingPlatform = gamingPlatform.toUpperCase();
-        }
         if (gamingMap) {
             toBeUpdated = true;
             newGame.gamingMap = gamingMap.toUpperCase();
-        }
-        if (gamingMode) {
-            toBeUpdated = true;
-            newGame.gamingMode = gamingMode.toUpperCase();
         }
         if (roomId) {
             toBeUpdated = true;
