@@ -8,9 +8,31 @@ const GameHistory = require("../models/games/GameHistory");
 
 // to create a game
 const createGame = async (req, res) => {
+
+    // maps having max players limits
+    const _fullCapacityMaps = ['ERANGEL', 'SANHOK', 'MIRAMAR', 'VIKENDI'];  // max players: 100, allowed players: 92(100 - 8)
+    const _livikMap = ['LIVIK'];  // max players: 52, allowed: 44
+    const _karakinMap = ['KARAKIN'];  // max players: 64, allowed: 56
+    const _nusaMap = ['NUSA'];  // max players: 32, allowed: 28
+
     try {
         // fetch all the game information from the req body
-        const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee, maxPlayers } = req.body;
+        const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee } = req.body;
+        let maxPlayers = req.body.maxPlayers;        
+
+        // now, figure out the max limit of the players in the particular maps ( ERANGEL_100 | NUSA_32 | SANHOK_100 | KARAKIN_64 | MIRAMAR_100 | LIVIK_52 | VIKENDI_100 )
+        if (_fullCapacityMaps.includes(gamingMap.toUpperCase())) {
+            if (!maxPlayers <= 92) maxPlayers = 92;  // if the value is more than 92 or undefined then it will become 92
+        }
+        else if (_livikMap.includes(gamingMap.toUpperCase())) {  // setting the maximum allowed players value
+            if (!maxPlayers <= 44) maxPlayers = 44;
+        }
+        else if (_karakinMap.includes(gamingMap.toUpperCase())) {  // setting the maximum allowed players value
+            if (!maxPlayers <= 56) maxPlayers = 56
+        }
+        else if (_nusaMap.includes(gamingMap.toUpperCase())) {  // setting the maximum allowed players value
+            if (!maxPlayers <= 28) maxPlayers = 28;
+        }
 
         // now confirm the admin identity
         let admin = await Admin.findById(req.user.id);
