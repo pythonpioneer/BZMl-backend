@@ -346,7 +346,7 @@ const registerInSoloGame = async (req, res) => {
         // update the game by entering player id and slot numbers
         game = await Game.findByIdAndUpdate(
             gameId,
-            { $push: { slots: { player: player._id, slotNumber } } },
+            { $push: { slots: { player: player._id, slotNumber: slotNumber[0] } } },
             { new: true }
         );
 
