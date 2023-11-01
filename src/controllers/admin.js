@@ -358,7 +358,7 @@ const recoverPassword = async (req, res) => {
                 // otp sent successfully
                 return res.status(200).json({ status: 200, message: "OTP sent to your email", info: "verify your Email" });
             })
-            .catch(err => res.status(500).json({  // failure in recover password model
+            .catch(err => res.status(500).json({  // failure in recover password model (returning by default #148)
                 errors: "Email Failure!",
                 issue: err
             }));
