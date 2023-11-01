@@ -248,7 +248,7 @@ const setUserDetails = async (req, res) => {
 
             // now find the user that to be updated and confirm that the user exists
             let user = await User.findById(req.user.id);
-            if (!user) res.status(404).json({ status: 404, message: "User Not Found" });
+            if (!user) return res.status(404).json({ status: 404, message: "User Not Found" });
 
             // now update the user and send the response
             user = await User.findByIdAndUpdate(req.user.id, { $set: updatedUser }, { new: true });
