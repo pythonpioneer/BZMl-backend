@@ -372,6 +372,11 @@ const registerInSoloGame = async (req, res) => {
     }
 };
 
+// to register in game with squad or register in squad games
+const registerInSquadGame = async (req, res) => {
+    res.send("ok g");
+};
+
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame };
+module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame };
 
