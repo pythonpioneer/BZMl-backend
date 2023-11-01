@@ -179,10 +179,10 @@ const loginUser = async (req, res) => {
 
         // generate auth-token send it
         const authToken = generateToken(payloadData);
-        res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken });
+        return res.status(200).json({ status: 200, "message": "user Logged In", "auth-token": authToken });
 
     } catch (err) {
-        res.status(500).json({  // any unrecogonize error will be raised from here
+        return res.status(500).json({  // any unrecogonize error will be raised from here
             errors: "Internal server error",
             issue: err
         });
@@ -252,10 +252,10 @@ const setUserDetails = async (req, res) => {
 
             // now update the user and send the response
             user = await User.findByIdAndUpdate(req.user.id, { $set: updatedUser }, { new: true });
-            res.status(200).json({ status: 200, message: 'user updated', user: user });
+            return res.status(200).json({ status: 200, message: 'user updated', user: user });
         }
         // this will not send any json as response because status: 204
-        else res.status(204).json({ status: 204, message: "Nothing is there to be updated" });
+        else return res.status(204).json({ status: 204, message: "Nothing is there to be updated" });
 
     } catch (err) {
         return res.status(500).json({ status: 500, errors: "Internal server error", issue: err });
@@ -407,7 +407,7 @@ const getPlayerDetails = async (req, res) => {
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Overall Player Stats!", player: player });
+            return res.status(200).json({ status: 200, message: "Overall Player Stats!", player: player });
         }
         else if (statsType === 'season') {  // fetch the current season stats
 
@@ -416,7 +416,7 @@ const getPlayerDetails = async (req, res) => {
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Season Player Stats!", player: player });
+            return res.status(200).json({ status: 200, message: "Season Player Stats!", player: player });
         }
         else if (statsType === 'solo') {  // fetch the current season solo stats
 
@@ -425,7 +425,7 @@ const getPlayerDetails = async (req, res) => {
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Solo Player Stats!", player: player });
+            return res.status(200).json({ status: 200, message: "Solo Player Stats!", player: player });
         }
         else if (statsType === 'duo') {  // fetch the current season duo stats
 
@@ -434,7 +434,7 @@ const getPlayerDetails = async (req, res) => {
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Duo Player Stats!", player: player });
+            return res.status(200).json({ status: 200, message: "Duo Player Stats!", player: player });
         }
         else if (statsType === 'squad') {  // fetch the current season squad stats
 
@@ -443,7 +443,7 @@ const getPlayerDetails = async (req, res) => {
             if (!player) return res.status(404).json({ status: 404, message: "Player not Found!!" });
 
             // send the player data
-            res.status(200).json({ status: 200, message: "Squad Player Stats!", player: player });
+            return res.status(200).json({ status: 200, message: "Squad Player Stats!", player: player });
         }
         else {  // if the stat-type is not valid (already validated by validation middlwares)
             return res.status(404).json({ status: 404, message: "Invalid query!!" });
