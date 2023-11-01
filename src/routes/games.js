@@ -24,8 +24,11 @@ router.put('/update-game', [
     ...validateMongoId(['game-id']),
 ],  validateValidationResult, fetchUser, updateGame);
 
-// Route 5: To register in the game: '/bzml/api/v1/games/register' [using PATCH] (login required)
+// Route 5: To register in the solo game: '/bzml/api/v1/games/register-solo?game-id=<mogno id>' [using PATCH] (login required)
 router.patch('/register-solo', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInSoloGame);
+
+// Route 6: To register in the squad game: '/bzml/api/v1/games/register-squad?game-id=<mogno id>' [using PATCH] (login required)
+router.patch('/register-squad', validateMongoId(['game-id']), validateValidationResult, fetchUser, );
 
 // export the router
 module.exports = router;

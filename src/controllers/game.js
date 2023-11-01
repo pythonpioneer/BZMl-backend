@@ -367,7 +367,7 @@ const registerInSoloGame = async (req, res) => {
         user.save();
 
         return res.status(200).json({ status: 200, message: "User registered in the game, Successfully!!", slotNumber });
-    } catch (err) {
+    } catch (err) {  // unrecogonized errors
         return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
