@@ -400,6 +400,22 @@ const registerInSquadGame = async (req, res) => {
         // if player is not ban or not blocked then the player continues
         if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });        
 
+        // now make sure there is still place for the players to join/regster in the game
+        if (game.slotLength <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
+
+        // now, check that the player is not already registered
+        // to doo
+
+        // make sure that user have sufficient cash for the match
+        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
+
+        
+
+
+
+
+
+
         
         res.send(gameId);
 
