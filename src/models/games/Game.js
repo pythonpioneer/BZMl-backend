@@ -75,11 +75,28 @@ const gameSchema = new Schema({
         default: Array.from({ length: 100 - 8 }, (_, index) => index + 9), // You can provide a default array of available slots
         required: true, // You can make the field required if needed
     },
+    slotStatus: {  // this field used in squad and solo game modes
+        type: [
+            {
+                code: {
+                    type: String,
+                },
+                isFull: {
+                    type: Boolean
+                }
+            }
+        ],
+        default: []
+    },
+    slotLength: {  // this field used in squad and solo game modes
+        type: Number,
+        default: 0,
+    },
     timeStamp: {  // after 24 hrs, the record will be deleted
         type: Date,
         expires: 86400,
         default: Date.now,
-    }
+    },
 });
 
 // export the model

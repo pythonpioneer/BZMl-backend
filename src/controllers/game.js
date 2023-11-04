@@ -71,6 +71,7 @@ const createGame = async (req, res) => {
             entryFee: entryFee,
             maxPlayers: maxPlayers,
             availableSlots: availableSlots,
+            slotLength: availableSlots.length,
         })
             .then((game) => {
                 // now push the game data into game history
