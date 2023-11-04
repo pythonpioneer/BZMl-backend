@@ -4,7 +4,7 @@ const User = require("../models/user/User");
 const Game = require("../models/games/Game");
 const Player = require("../models/players/Player");
 const GameHistory = require("../models/games/GameHistory");
-const { generateSlots } = require("../helper/utility/generateSlots");
+const { generateSlots, generateSlotCode } = require("../helper/utility/generateSlots");
 
 
 // to create a game
@@ -378,6 +378,7 @@ const registerInSquadGame = async (req, res) => {
     try {
         // fetch the data from the query param
         const gameId = req.query['game-id'];
+        let { teamCode, isSquadAvailable } = req.body;
 
         // confirm that the user exist
         let user = await User.findById(req.user.id);
@@ -398,26 +399,40 @@ const registerInSquadGame = async (req, res) => {
         if (!player) return res.status(404).json({ status: 404, message: "player not found!" });
 
         // if player is not ban or not blocked then the player continues
-        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });        
+        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });      
+        
+        // make sure that user have sufficient cash for the match
+        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
 
         // now make sure there is still place for the players to join/regster in the game
         if (game.slotLength <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
 
         // now, check that the player is not already registered
-        // to doo
+        // todo..
 
-        // make sure that user have sufficient cash for the match
-        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
+        // if team code is there, then register the user and give theslots
+        // todo..
 
+        // if the squad is not there then find the perfect slot for the player
+        // todo..
+
+        // generate the team code, if there is no team code, and the player has team (the first player of the team)
+        if (!teamCode) {
+            teamCode = generateSlotCode(game.slotStatus);  // got an unique team code
         
+            // now, set the slot status
+            game.slotStatus.push({ code: teamCode, isFull: true });
+            game.save();
+
+            // now, find the slot for the 
+        }
+
+        // generate the slot code
+        res.send(game)
 
 
 
 
-
-
-        
-        res.send(gameId);
 
     } catch (err) {  // unrecogonized errors
         return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });

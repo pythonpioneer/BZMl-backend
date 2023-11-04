@@ -75,7 +75,7 @@ const gameSchema = new Schema({
         default: Array.from({ length: 100 - 8 }, (_, index) => index + 9), // You can provide a default array of available slots
         required: true, // You can make the field required if needed
     },
-    slotStatus: {  // this field used in squad and solo game modes
+    slotStatus: {  // this field used in squad and duo game modes
         type: [
             {
                 code: {
@@ -88,7 +88,7 @@ const gameSchema = new Schema({
         ],
         default: []
     },
-    slotLength: {  // this field used in squad and solo game modes
+    slotLength: {  // this field used in squad and duo game modes
         type: Number,
         default: 0,
     },
