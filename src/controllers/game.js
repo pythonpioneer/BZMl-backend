@@ -374,7 +374,37 @@ const registerInSoloGame = async (req, res) => {
 
 // to register in game with squad or register in squad games
 const registerInSquadGame = async (req, res) => {
-    res.send("ok g");
+    try {
+        // fetch the data from the query param
+        const gameId = req.query['game-id'];
+
+        // confirm that the user exist
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // confirm that the game exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
+
+        // if the game is not solo then return the bad response
+        if (game.gamingMode.toLowerCase() != 'squad') return res.status(403).json({ status: 403, message: "This API is for SQUAD modes only." });
+
+        // now, check that the user is verified and can register in the game
+        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!"});
+
+        // now, find that the player exist
+        let player = await Player.findOne({ pubgID: user.pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "player not found!" });
+
+        // if player is not ban or not blocked then the player continues
+        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });        
+
+        
+        res.send(gameId);
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
 };
 
 // exporting required methods
