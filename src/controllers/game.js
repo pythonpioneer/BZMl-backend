@@ -437,9 +437,44 @@ const registerInSquadGame = async (req, res) => {
         // make sure that user have sufficient cash for the match
         if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
 
-
         // if team code is there, then register the user and give theslots
-        // todo...
+        if (teamCode) {
+
+            let teamPosition;  // the position of the team
+
+            // now, find the team code index
+            for (let i=game.slotStatus.length-1; i>=0; i--) {
+                if (game.slotStatus[i].code === teamCode) {
+                    teamPosition = i;
+                }
+            }
+
+            // now, check that the team is available or teamcode exists 
+            if (!teamPosition) return res.status(404).json({ status: 404, message: "Invalid Team Code!!", info: "Team Code not Found!" });
+
+            // if we have the team code then check that the slot is available or not
+            let slots = game.availableSlots[teamPosition];
+            if (slots.length === 0) return res.status(404).json({ status: 404, message: "No available slots for this team!" }); 
+
+            // if there is slot available then give the player a slot number
+            let slotNumber = game.availableSlots[teamPosition].pop();
+            game.players.push(player._id);  // save player with slots
+            game.save();
+
+            // save the player and slots in game slot array
+            game = await Game.findByIdAndUpdate(
+                gameId,
+                { $push: { slots: { player: player._id, slotNumber } } },
+                { new: true }
+            );
+
+            // deduct the cash from user accounts
+            user.myCash -= game.entryFee;
+            user.save();
+
+            // player registered successfully
+            return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+        }
 
         // if the player is new and he/she is trying to register in the game
         if (!teamCode && isSquadAvailable === true) {
