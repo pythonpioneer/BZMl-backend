@@ -25,7 +25,8 @@ const createGame = async (req, res) => {
         // fetch all the game information from the req body
         const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee } = req.body;
         let maxPlayers = req.body.maxPlayers;
-        let availableSlots;  // to generate the slot array based on maps        
+        let availableSlots;  // to generate the slot array based on maps 
+        let slotStatus = [];  // this array will contain all the team codes and team status       
 
         // now, figure out the max limit of the players in the particular maps ( ERANGEL_100 | NUSA_32 | SANHOK_100 | KARAKIN_64 | MIRAMAR_100 | LIVIK_52 | VIKENDI_100 )
         if (_fullCapacityMaps.includes(gamingMap.toUpperCase())) {
@@ -51,7 +52,18 @@ const createGame = async (req, res) => {
         // now, set the mode of the game to generate the available slots
         if (gamingMode.toUpperCase() === 'SOLO') teamMembers = 1;
         else if (gamingMode.toUpperCase() === 'DUO') teamMembers = 2;
-        else if (gamingMode.toUpperCase() === 'SQUAD') teamMembers = 4;
+        else if (gamingMode.toUpperCase() === 'SQUAD') {
+            teamMembers = 4;
+
+            // generating team code and full status must be false 
+            let randomCode;
+            for (let i=0; i<maxPlayers; i+=4) {
+                
+                // getting random codes and saving the code for every slot
+                randomCode = generateSlotCode(slotStatus);
+                slotStatus.push({ code: randomCode, isFull: false });
+            }
+        }
 
         // now, generate the available slot array
         availableSlots = generateSlots({ allowedPlayers, teamMembers, firstSlot });
@@ -72,6 +84,7 @@ const createGame = async (req, res) => {
             maxPlayers: maxPlayers,
             availableSlots: availableSlots,
             slotLength: availableSlots.length,
+            slotStatus: slotStatus,
         })
             .then((game) => {
                 // now push the game data into game history
@@ -417,15 +430,15 @@ const registerInSquadGame = async (req, res) => {
         // todo..
 
         // generate the team code, if there is no team code, and the player has team (the first player of the team)
-        if (!teamCode) {
-            teamCode = generateSlotCode(game.slotStatus);  // got an unique team code
+        // if (!teamCode) {
+        //     teamCode = generateSlotCode(game.slotStatus);  // got an unique team code
         
-            // now, set the slot status
-            game.slotStatus.push({ code: teamCode, isFull: true });
-            game.save();
+        //     // now, set the slot status
+        //     game.slotStatus.push({ code: teamCode, isFull: true });
+        //     game.save();
 
-            // now, find the slot for the 
-        }
+        //     // now, find the slot for the 
+        // }
 
         // generate the slot code
         res.send(game)

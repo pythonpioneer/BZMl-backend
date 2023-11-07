@@ -82,7 +82,7 @@ const gameSchema = new Schema({
                     type: String,
                 },
                 isFull: {
-                    type: Boolean
+                    type: Boolean,  // this must false initially
                 }
             }
         ],
