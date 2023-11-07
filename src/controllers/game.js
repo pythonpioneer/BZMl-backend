@@ -419,8 +419,8 @@ const registerInSquadGame = async (req, res) => {
 
         // finding the starting point to find the teamCode from the slotNumber
         let startingPoint;
-        if (game.gamingMap === 'NUSA') startingPoint = 8;
-        else startingPoint = 12;
+        if (game.gamingMap === 'NUSA') startingPoint = 5;
+        else startingPoint = 9;
 
         if (isIds.length != 0) {  // if player is already registered
 
@@ -428,7 +428,7 @@ const registerInSquadGame = async (req, res) => {
             let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
 
             // now, find the team code for the player slots
-            let teamPosition = Math.ceil((slotNumber - startingPoint) / 4);
+            let teamPosition = Math.floor((slotNumber - startingPoint) / 4);
             let teamCode = game.slotStatus[teamPosition].code;
 
             return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber, teamCode }); 
