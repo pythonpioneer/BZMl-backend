@@ -311,7 +311,7 @@ const registerInSoloGame = async (req, res) => {
         let game = await Game.findById(gameId);
         if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
 
-        // if the game is not solo then return the bad response
+        // if the game is not solo then return the bad response (development purpose)
         if (game.gamingMode.toLowerCase() != 'solo') return res.status(403).json({ status: 403, message: "This API is for SOLO modes only." });
 
         // now, check that the user is verified and can register in the game
@@ -388,7 +388,7 @@ const registerInSquadGame = async (req, res) => {
         let game = await Game.findById(gameId);
         if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
 
-        // if the game is not solo then return the bad response
+        // if the game is not squad then return the bad response (development purpose)
         if (game.gamingMode.toLowerCase() != 'squad') return res.status(403).json({ status: 403, message: "This API is for SQUAD modes only." });
 
         // now, check that the user is verified and can register in the game

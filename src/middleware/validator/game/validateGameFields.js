@@ -21,7 +21,7 @@ exports.validateGameFields = [
     ...validateGameMode(['gamingMode']),
     ...validateGameMap(['gamingMap']),
     ...validateMoney(['prizePool', 'entryFee']),
-    check('gamingTitle', "enter a valid title (alpha numeric)").isAlphanumeric('en-US', { ignore: ' '}).isLength({ min: 3, max: 50 }),
+    check('gamingTitle', "enter a valid title").isLength({ min: 3, max: 100 }),
 ];
 
 // validate the game fields to update the game

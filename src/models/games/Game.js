@@ -92,7 +92,7 @@ const gameSchema = new Schema({
         type: Number,
         default: 0,
     },
-    timeStamp: {  // after 24 hrs, the record will be deleted
+    timeStamp: {  // after 24 hrs, the record will be deleted (change it to 3 hrs after development)
         type: Date,
         expires: 86400,
         default: Date.now,
