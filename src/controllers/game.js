@@ -414,38 +414,70 @@ const registerInSquadGame = async (req, res) => {
         // if player is not ban or not blocked then the player continues
         if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });      
         
+        // now, check that the player is not already registered
+        let isIds = game.players.filter(value => value.toString() === player._id.toString());
+
+        // finding the starting point to find the teamCode from the slotNumber
+        let startingPoint;
+        if (game.gamingMap === 'NUSA') startingPoint = 8;
+        else startingPoint = 12;
+
+        if (isIds.length != 0) {  // if player is already registered
+
+            // find the slot number of the registered player and return the response to the player
+            let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
+
+            // now, find the team code for the player slots
+            let teamPosition = Math.ceil((slotNumber - startingPoint) / 4);
+            let teamCode = game.slotStatus[teamPosition].code;
+
+            return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber, teamCode }); 
+        }
+
         // make sure that user have sufficient cash for the match
         if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
 
-        // now make sure there is still place for the players to join/regster in the game
-        if (game.slotLength <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
-
-        // now, check that the player is not already registered
-        // todo..
 
         // if team code is there, then register the user and give theslots
-        // todo..
+        // todo...
 
-        // if the squad is not there then find the perfect slot for the player
-        // todo..
+        // if the player is new and he/she is trying to register in the game
+        if (!teamCode && isSquadAvailable === true) {
 
-        // generate the team code, if there is no team code, and the player has team (the first player of the team)
-        // if (!teamCode) {
-        //     teamCode = generateSlotCode(game.slotStatus);  // got an unique team code
+            // check that the slots are avialable or  not
+            if (game.slotLength <= 0) return res.status(200).json({ status: 200, message: "No slots for squads, Try registering solo or Enter your team code!" });
+
+            // now, find the slot for the player and give him a team code
+            let teamCode = game.slotStatus[game.slotLength - 1].code;  // contain the team code 
+            let slotNumber = game.availableSlots[game.slotLength - 1].pop();
+
+            // now, make changes in the game and update the game
+            game.slotStatus[game.slotLength - 1].isFull = true;
+            game.slotLength -= 1;
+            game.players.push(player._id);  // save player with slots
+            game.save();
+
+            // save the player and slots in game slot array
+            game = await Game.findByIdAndUpdate(
+                gameId,
+                { $push: { slots: { player: player._id, slotNumber } } },
+                { new: true }
+            );
+
+            // deduct the cash from user accounts
+            user.myCash -= game.entryFee;
+            user.save();
+
+            // player registered successfully
+            return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+        }
+
         
-        //     // now, set the slot status
-        //     game.slotStatus.push({ code: teamCode, isFull: true });
-        //     game.save();
-
-        //     // now, find the slot for the 
-        // }
-
-        // generate the slot code
-        res.send(game)
 
 
 
 
+        else res.send("ok")
 
     } catch (err) {  // unrecogonized errors
         return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
