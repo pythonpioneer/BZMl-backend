@@ -369,7 +369,7 @@ const registerInSoloGame = async (req, res) => {
         game.players.push(player._id);
         game.save();
 
-        // // now find the game in game history
+        // now find the game in game history
         let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
 
         // now, save the player in gameHistory
@@ -468,6 +468,13 @@ const registerInSquadGame = async (req, res) => {
                 { new: true }
             );
 
+            // now find the game in game history
+            let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+            // now, save the player in gameHistory
+            gameHistory.players.push(player._id);
+            gameHistory.save();
+
             // deduct the cash from user accounts
             user.myCash -= game.entryFee;
             user.save();
@@ -498,6 +505,13 @@ const registerInSquadGame = async (req, res) => {
                 { $push: { slots: { player: player._id, slotNumber } } },
                 { new: true }
             );
+
+            // now find the game in game history
+            let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+            // now, save the player in gameHistory
+            gameHistory.players.push(player._id);
+            gameHistory.save();
 
             // deduct the cash from user accounts
             user.myCash -= game.entryFee;
