@@ -31,7 +31,7 @@ exports.validateSquadRegistration = [
     ...validateMongoId(['game-id']),
     ...validateBooleanOnly(['wantRandomPlayers'], true),
     ...validateBooleanOnly(['canPlaySolo'], true),
-    // validate the team code
+    check('teamCode', 'Enter a valid team code!').isLength({ min: 5, max: 5 }).optional(),
 ];
 
 // validate the game fields to update the game
