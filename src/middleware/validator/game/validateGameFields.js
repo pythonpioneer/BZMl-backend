@@ -4,6 +4,8 @@ const { validateGamePlatform } = require('../../../helper/utility/validateFields
 const { validateGameMode } = require('../../../helper/utility/validateFields/gameModeField');
 const { validateMoney } = require('../../../helper/utility/validateFields/moneyField');
 const { validateGameMap } = require('../../../helper/utility/validateFields/mapField');
+const { validateMongoId } = require('../../../helper/utility/validateFields/mongoFields');
+const { validateBooleanOnly } = require('../../../helper/utility/validateFields/booleanOnlyField');
 
 
 // contain all game fields
@@ -22,6 +24,14 @@ exports.validateGameFields = [
     ...validateGameMap(['gamingMap']),
     ...validateMoney(['prizePool', 'entryFee']),
     check('gamingTitle', "enter a valid title").isLength({ min: 3, max: 100 }),
+];
+
+// validate squad registration
+exports.validateSquadRegistration = [
+    ...validateMongoId(['game-id']),
+    ...validateBooleanOnly(['wantRandomPlayers'], true),
+    ...validateBooleanOnly(['canPlaySolo'], true),
+    // validate the team code
 ];
 
 // validate the game fields to update the game

@@ -4,7 +4,7 @@ const { createGame, getGames, deleteGame, updateGame, registerInSoloGame, regist
 const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
 
 // to validate input fields
-const { validateGameFields, validateUpdationFields } = require('../middleware/validator/game/validateGameFields');
+const { validateGameFields, validateUpdationFields, validateSquadRegistration } = require('../middleware/validator/game/validateGameFields');
 const { validateValidationResult } = require('../middleware/validator/validationMiddleware');
 const { validateMongoId } = require('../helper/utility/validateFields/mongoFields');
 
@@ -28,7 +28,7 @@ router.put('/update-game', [
 router.patch('/register-solo', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInSoloGame);
 
 // Route 6: To register in the squad game: '/bzml/api/v1/games/register-squad?game-id=<mogno id>' [using PATCH] (login required)
-router.patch('/register-squad', validateMongoId(['game-id']), validateValidationResult, fetchUser, registerInSquadGame);
+router.patch('/register-squad', validateSquadRegistration, validateValidationResult, fetchUser, registerInSquadGame);
 
 // export the router
 module.exports = router;
