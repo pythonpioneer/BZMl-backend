@@ -335,7 +335,7 @@ const updatePassword = async (req, res) => {
         // user's password updated
         return res.status(200).json({ status: 200, message: "Password updated Successfully!" });
 
-    } catch (err) {
+    } catch (err) {  // unrecogonized errors
         return res.status(500).json({ errors: "Internal server error", issue: err });
     }
 };

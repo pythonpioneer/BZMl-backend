@@ -4,7 +4,7 @@ const User = require("../models/user/User");
 const Game = require("../models/games/Game");
 const Player = require("../models/players/Player");
 const GameHistory = require("../models/games/GameHistory");
-const { generateSlots } = require("../helper/utility/generateSlots");
+const { generateSlots, generateSlotCode } = require("../helper/utility/generateSlots");
 
 
 // to create a game
@@ -25,7 +25,8 @@ const createGame = async (req, res) => {
         // fetch all the game information from the req body
         const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee } = req.body;
         let maxPlayers = req.body.maxPlayers;
-        let availableSlots;  // to generate the slot array based on maps        
+        let availableSlots;  // to generate the slot array based on maps 
+        let slotStatus = [];  // this array will contain all the team codes and team status       
 
         // now, figure out the max limit of the players in the particular maps ( ERANGEL_100 | NUSA_32 | SANHOK_100 | KARAKIN_64 | MIRAMAR_100 | LIVIK_52 | VIKENDI_100 )
         if (_fullCapacityMaps.includes(gamingMap.toUpperCase())) {
@@ -51,7 +52,18 @@ const createGame = async (req, res) => {
         // now, set the mode of the game to generate the available slots
         if (gamingMode.toUpperCase() === 'SOLO') teamMembers = 1;
         else if (gamingMode.toUpperCase() === 'DUO') teamMembers = 2;
-        else if (gamingMode.toUpperCase() === 'SQUAD') teamMembers = 4;
+        else if (gamingMode.toUpperCase() === 'SQUAD') {
+            teamMembers = 4;
+
+            // generating team code and full status must be false 
+            let randomCode;
+            for (let i = 0; i < maxPlayers; i += 4) {
+
+                // getting random codes and saving the code for every slot
+                randomCode = generateSlotCode(slotStatus);
+                slotStatus.push({ code: randomCode, isFull: false });
+            }
+        }
 
         // now, generate the available slot array
         availableSlots = generateSlots({ allowedPlayers, teamMembers, firstSlot });
@@ -71,6 +83,8 @@ const createGame = async (req, res) => {
             entryFee: entryFee,
             maxPlayers: maxPlayers,
             availableSlots: availableSlots,
+            slotLength: availableSlots.length,
+            slotStatus: slotStatus,
         })
             .then((game) => {
                 // now push the game data into game history
@@ -184,7 +198,7 @@ const deleteGame = async (req, res) => {
     /* this method is not for export, it is used inside the game.js
     In this method host or superuser want to delete the game. (don't export) */
     async function _deleteGame(gameId, Game, GameHistory) {
-        
+
         // now, delete the game from Game table
         let game = await Game.findByIdAndDelete(gameId);
 
@@ -199,7 +213,7 @@ const deleteGame = async (req, res) => {
             deletedOn: Date.now(),
             gameStatus: game.isGameStarted ? "game started" : "game didn't started",
         };
-        
+
         // now, push the data into gameHistory with gameStatus=failed and gameDeletedOn=<current date>
         await GameHistory.updateOne({ gameId: game._id }, { $set: newGame }, { new: true });
         return res.status(200).json({ "status": 200, "message": "Game Deleted" });
@@ -310,11 +324,11 @@ const registerInSoloGame = async (req, res) => {
         let game = await Game.findById(gameId);
         if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
 
-        // if the game is not solo then return the bad response
+        // if the game is not solo then return the bad response (development purpose)
         if (game.gamingMode.toLowerCase() != 'solo') return res.status(403).json({ status: 403, message: "This API is for SOLO modes only." });
 
         // now, check that the user is verified and can register in the game
-        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!"});
+        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!" });
 
         // now, find that the player exist
         let player = await Player.findOne({ pubgID: user.pubgID });
@@ -324,7 +338,7 @@ const registerInSoloGame = async (req, res) => {
         if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });
 
         // now make sure there is still place for the players to join/regster in the game
-        if (game.availableSlots.length <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." }); 
+        if (game.availableSlots.length <= 0) return res.status(403).json({ status: 403, message: "Game slots are full. You cannot join the game at this time." });
 
         // now, check that the player is not already registered
         let isIds = game.players.filter(value => value.toString() === player._id.toString());
@@ -333,7 +347,7 @@ const registerInSoloGame = async (req, res) => {
 
             // find the slot number of the registered player and return the response to the player
             let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
-            return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber }); 
+            return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber });
         }
 
         // make sure that user have sufficient cash for the match
@@ -355,7 +369,7 @@ const registerInSoloGame = async (req, res) => {
         game.players.push(player._id);
         game.save();
 
-        // // now find the game in game history
+        // now find the game in game history
         let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
 
         // now, save the player in gameHistory
@@ -367,11 +381,254 @@ const registerInSoloGame = async (req, res) => {
         user.save();
 
         return res.status(200).json({ status: 200, message: "User registered in the game, Successfully!!", slotNumber });
-    } catch (err) {
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
+// to register in game with squad or register in squad games
+const registerInSquadGame = async (req, res) => {
+    try {
+        // fetch the data from the query param
+        const gameId = req.query['game-id'];
+        let { teamCode, wantRandomPlayers, canPlaySolo } = req.body;
+
+        // confirm that the user exist
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // confirm that the game exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
+
+        // if the game is not squad then return the bad response (development purpose)
+        if (game.gamingMode.toLowerCase() != 'squad') return res.status(403).json({ status: 403, message: "This API is for SQUAD modes only." });
+
+        // now, check that the user is verified and can register in the game
+        if (!user.isVerified) return res.status(404).json({ status: 403, message: "User is not verified!" });
+
+        // now, find that the player exist
+        let player = await Player.findOne({ pubgID: user.pubgID });
+        if (!player) return res.status(404).json({ status: 404, message: "player not found!" });
+
+        // if player is not ban or not blocked then the player continues
+        if (player.isBan || player.isBlocked) return res.status(403).json({ status: 403, message: "Either player is ban or blocked!!" });
+
+        // now, check that the player is not already registered
+        let isIds = game.players.filter(value => value.toString() === player._id.toString());
+
+        // finding the starting point to find the teamCode from the slotNumber
+        let startingPoint;
+        if (game.gamingMap === 'NUSA') startingPoint = 5;
+        else startingPoint = 9;
+
+        if (isIds.length !== 0) {  // if player is already registered
+
+            // find the slot number of the registered player and return the response to the player
+            let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
+
+            // now, find the team code for the player slots
+            let teamPosition = Math.floor((slotNumber - startingPoint) / 4);
+            let teamCode = game.slotStatus[teamPosition].code;
+
+            return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber, teamCode });
+        }
+
+        // make sure that user have sufficient cash for the match
+        if (user.myCash < game.entryFee) return res.status(402).json({ status: 402, message: "Insufficient funds in your account." });
+
+        // if team code is there, then register the user and give theslots
+        if (teamCode) {
+
+            let teamPosition;  // the position of the team
+
+            // now, find the team code index
+            for (let i = game.slotStatus.length - 1; i >= 0; i--) {
+                if (game.slotStatus[i].code === teamCode) {
+                    teamPosition = i;
+                }
+            }
+
+            // now, check that the team is available or teamcode exists 
+            if (!teamPosition) return res.status(404).json({ status: 404, message: "Invalid Team Code!!", info: "Team Code not Found!" });
+
+            // if we have the team code then check that the slot is available or not
+            let slots = game.availableSlots[teamPosition];
+            if (slots.length === 0) return res.status(404).json({ status: 404, message: "No available slots for this team!" });
+
+            // if there is slot available then give the player a slot number
+            let slotNumber = game.availableSlots[teamPosition].pop();
+            game.players.push(player._id);  // save player with slots
+            game.save();
+
+            // save the player and slots in game slot array
+            game = await Game.findByIdAndUpdate(
+                gameId,
+                { $push: { slots: { player: player._id, slotNumber } } },
+                { new: true }
+            );
+
+            // now find the game in game history
+            let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+            // now, save the player in gameHistory
+            gameHistory.players.push(player._id);
+            gameHistory.save();
+
+            // deduct the cash from user accounts
+            user.myCash -= game.entryFee;
+            user.save();
+
+            // player registered successfully
+            return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+        }
+
+        // if the player is new and he/she is the first one who is trying to register in the game
+        if (!teamCode && wantRandomPlayers === false) {
+
+            // check that the slots are avialable or  not
+            if (game.slotLength <= 0) return res.status(200).json({ status: 200, message: "No slots for squads, Try registering solo or Enter your team code!" });
+
+            // now, find the slot for the player and give him a team code
+            let teamCode = game.slotStatus[game.slotLength - 1].code;  // contain the team code 
+            let slotNumber = game.availableSlots[game.slotLength - 1].pop();
+
+            // now, make changes in the game and update the game
+            game.slotStatus[game.slotLength - 1].isFull = true;
+            game.slotLength -= 1;
+            game.players.push(player._id);  // save player with slots
+            game.save();
+
+            // save the player and slots in game slot array
+            game = await Game.findByIdAndUpdate(
+                gameId,
+                { $push: { slots: { player: player._id, slotNumber } } },
+                { new: true }
+            );
+
+            // now find the game in game history
+            let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+            // now, save the player in gameHistory
+            gameHistory.players.push(player._id);
+            gameHistory.save();
+
+            // deduct the cash from user accounts
+            user.myCash -= game.entryFee;
+            user.save();
+
+            // player registered successfully
+            return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+        }
+
+        // now, if the player don't have the team code and he/she want to play with other team
+        if (!teamCode && wantRandomPlayers === true) {
+
+            // to check that there is any random slots
+            let hasRandomSlots = false;
+            let randomSlot;
+
+            // find all the slots where the status is false to give the player a suitable slot
+            for (let slot = game.slotStatus.length-1; slot >= 0; slot--) {
+
+                // finding whose status is false only
+                if (!game.slotStatus[slot].isFull) {
+
+                    // if there is any slot with players
+                    if (game.availableSlots[slot].length < 4 && game.availableSlots[slot].length !== 0) {
+                        hasRandomSlots = true;
+                        randomSlot = slot;
+                        break;  // only want a random slot
+                    }
+                }
+            }
+
+            // if there is random slots, who need random players in the squad
+            if (hasRandomSlots) {
+
+                // determine the slots
+                const slotPosition = randomSlot;  // the slot contain less than 4 players
+                const teamCode = game.slotStatus[slotPosition].code;
+                const slotNumber = game.availableSlots[slotPosition].pop();
+
+                // now, make the changes in the game model
+                game.players.push(player._id);
+                game.save(); 
+
+                // save the player and slots in game slot array
+                game = await Game.findByIdAndUpdate(
+                    gameId,
+                    { $push: { slots: { player: player._id, slotNumber } } },
+                    { new: true }
+                );
+
+                // now find the game in game history
+                let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+                // now, save the player in gameHistory
+                gameHistory.players.push(player._id);
+                gameHistory.save();
+
+                // deduct the cash from user accounts
+                user.myCash -= game.entryFee;
+                user.save();
+
+                // player registered successfully
+                return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+            }
+            else {  // if there is no random slots
+
+                // check that the slots are avialable or  not
+                if (game.slotLength <= 0) return res.status(200).json({ status: 200, message: "No slots for squads" });
+
+                // check that the player want to play solo vs squad 
+                if (canPlaySolo) {
+
+                    // this is the first empty slot
+                    const slotPosition = game.slotLength - 1;
+                    const teamCode = game.slotStatus[slotPosition].code;
+                    const slotNumber = game.availableSlots[slotPosition].pop();
+
+                    // now, make the changes in the game model
+                    game.slotLength -= 1;
+                    game.players.push(player._id);
+                    game.save();  // uncomment after completion of this functionality
+
+                    // save the player and slots in game slot array
+                    game = await Game.findByIdAndUpdate(
+                        gameId,
+                        { $push: { slots: { player: player._id, slotNumber } } },
+                        { new: true }
+                    );
+
+                    // now find the game in game history
+                    let gameHistory = await GameHistory.findOne({ gameId: game._id });  // there is no-need to validate this variable
+
+                    // now, save the player in gameHistory
+                    gameHistory.players.push(player._id);
+                    gameHistory.save();
+
+                    // deduct the cash from user accounts
+                    user.myCash -= game.entryFee;
+                    user.save();
+
+                    // player registered successfully
+                    return res.status(200).json({ status: 200, message: "Player Registered Successfully!!", teamCode, slotNumber });
+                }
+                else {  // return no slot for squads
+                    return res.status(200).json({ status: 200, message: "No random slot available!!", info: "Tick the canPlaySolo box, to register solo, and wait for other player or invite them to play!!" });
+                }
+            }
+        }
+
+        // if player is doing something wrong
+        else return res.status(400).json({ status: 400, message: "There is an issue while registering in the game", info: "Probably the player doing something wrong while registering!!" });
+
+    } catch (err) {  // unrecogonized errors
         return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
 
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame };
+module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame };
 

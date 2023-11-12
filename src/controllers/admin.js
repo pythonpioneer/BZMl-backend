@@ -303,7 +303,7 @@ const updatePassword = async (req, res) => {
         admin.save();
 
         // // generate the notification template
-        const notify = notifyPasswordUpdation(admin.fullName);
+        const notify = notifyPasswordUpdation(admin.fullName, "Password Changed Successfully");
 
         // notify the admin that the password has been changed
         sendMail({
