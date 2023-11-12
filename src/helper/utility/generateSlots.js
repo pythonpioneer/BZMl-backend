@@ -1,3 +1,6 @@
+// importing requirements
+const { alpha, numeric } = require('../../constants');
+
 /**
  * This method will generate the slots array for the solo, duo and squad modes.
  * @param {Number} allowedPlayers - It takes the maximum number of allowed players in a match
@@ -30,8 +33,8 @@ exports.generateSlots = ({ allowedPlayers, teamMembers, firstSlot }) => {
 
 
 // we have the two random string from where we have to pick values to generate slot codes
-const _alpha = 'befjkqwxyz';
-const _numeric = '1234567896';
+const _alpha = alpha;  // 'befjkqwxyz'
+const _numeric = numeric;  // '1234567896'
 
 // method to generate team/slot code
 const _generateCode = (randomValue) => {
