@@ -426,7 +426,7 @@ const registerInSquadGame = async (req, res) => {
             let slotNumber = game.slots.find(value => value.player.toString() === player._id.toString()).slotNumber;
 
             // now, find the team code for the player slots
-            let teamPosition = Math.floor((slotNumber - startingPoint) / 4);
+            let teamPosition = Math.floor((slotNumber - startingPoint) / 4);  // squad: 4, duo: 2 => (game.maxPlayers / game.slotLength)
             let teamCode = game.slotStatus[teamPosition].code;
 
             return res.status(200).json({ status: 200, message: "Player is already registered!", slotNumber, teamCode });
@@ -627,6 +627,34 @@ const registerInSquadGame = async (req, res) => {
     }
 };
 
+// now, registering in duo games
+const registerInDuoGame = async (req, res) => {
+    try {
+        // fetch the data from the query param
+        const gameId = req.query['game-id'];
+        let { teamCode, wantRandomPlayers, canPlaySolo } = req.body;
+
+        // confirm that the user exist
+        let user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ status: 404, message: "user not found!" });
+
+        // confirm that the game exists
+        let game = await Game.findById(gameId);
+        if (!game) return res.status(404).json({ status: 404, message: "game not found!" });
+
+        // if the game is not squad then return the bad response (development purpose)
+        if (game.gamingMode.toLowerCase() != 'duo') return res.status(403).json({ status: 403, message: "This API is for DUO modes only." });
+
+        console.log(game);
+        res.send("ok")
+
+
+
+    } catch (err) {  // unrecogonized errors
+        return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
+    }
+};
+
 // exporting required methods
-module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame };
+module.exports = { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame, registerInDuoGame };
 
