@@ -26,7 +26,7 @@ const createGame = async (req, res) => {
         const { gamingTitle, gamingPlatform, gamingMode, prizePool, gamingMap, entryFee } = req.body;
         let maxPlayers = req.body.maxPlayers;
         let availableSlots;  // to generate the slot array based on maps 
-        let slotStatus = [];  // this array will contain all the team codes and team status       
+        let slotStatus = [];  // this array will contain all the team codes and team status (used in duo and squad registration)      
 
         // now, figure out the max limit of the players in the particular maps ( ERANGEL_100 | NUSA_32 | SANHOK_100 | KARAKIN_64 | MIRAMAR_100 | LIVIK_52 | VIKENDI_100 )
         if (_fullCapacityMaps.includes(gamingMap.toUpperCase())) {
@@ -52,17 +52,15 @@ const createGame = async (req, res) => {
         // now, set the mode of the game to generate the available slots
         if (gamingMode.toUpperCase() === 'SOLO') teamMembers = 1;
         else if (gamingMode.toUpperCase() === 'DUO') teamMembers = 2;
-        else if (gamingMode.toUpperCase() === 'SQUAD') {
-            teamMembers = 4;
+        else if (gamingMode.toUpperCase() === 'SQUAD') teamMembers = 4;
 
-            // generating team code and full status must be false 
-            let randomCode;
-            for (let i = 0; i < maxPlayers; i += 4) {
+        // now, generate the slot status for all teams. Generate team code and full status must be false 
+        let randomCode;
+        for (let i=0; i<maxPlayers; i+=teamMembers) {  // generate the status for all teams
 
-                // getting random codes and saving the code for every slot
-                randomCode = generateSlotCode(slotStatus);
-                slotStatus.push({ code: randomCode, isFull: false });
-            }
+            // getting random codes and saving the code for every slot
+            randomCode = generateSlotCode(slotStatus);
+            slotStatus.push({ code: randomCode, isFull: false });
         }
 
         // now, generate the available slot array
