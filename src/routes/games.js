@@ -30,5 +30,11 @@ router.patch('/register-solo', validateMongoId(['game-id']), validateValidationR
 // Route 6: To register in the squad game: '/bzml/api/v1/games/register-squad?game-id=<mogno id>' [using PATCH] (login required)
 router.patch('/register-squad', validateSquadRegistration, validateValidationResult, fetchUser, registerInSquadGame);
 
+// Route 7: To register in the duo game: '/bzml/api/v1/games/register-duo?game-id=<mogno id>' [using PATCH] (login required)
+router.patch('/register-duo', validateSquadRegistration, validateValidationResult, fetchUser, (req, res) => {
+    res.send("ok");
+});
+
+
 // export the router
 module.exports = router;
