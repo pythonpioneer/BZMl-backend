@@ -243,7 +243,7 @@ const deleteGame = async (req, res) => {
         }
         else return res.status(403).json({ status: 403, message: "Access Denied!!", info: "Admin access only!!" });  // any other admin want to delete the game
 
-    } catch (err) {
+    } catch (err) {  // unrecogonized errors
         return res.status(500).json({ status: 500, message: "Internal Server Error", issue: err });
     }
 };
@@ -727,12 +727,27 @@ const registerInDuoGame = async (req, res) => {
         // if the player is new and he/she is the first one who is trying to register in the game
         if (!teamCode && wantRandomPlayers === false) {
 
+            // find the slot position
+            let hasSlot = false;
+            let slotPosition;
+
+            for (let slot=game.availableSlots.length-1; slot >= 0; slot--) {  // finding the slot position for the players, who has a team to register
+                if (game.availableSlots[slot].length === 2) {
+                    hasSlot = true;
+                    slotPosition = slot;
+                    break;
+                }
+            }
+
+            // if there is slot then register else not
+            if (!hasSlot) return res.status(200).json({ status: 200, message: "No slots for duo, Try registering solo or Enter your team code!" });
+
             // check that the slots are avialable or  not
             if (game.slotLength <= 0) return res.status(200).json({ status: 200, message: "No slots for squads, Try registering solo or Enter your team code!" });
 
             // now, find the slot for the player and give him a team code
-            let teamCode = game.slotStatus[game.slotLength - 1].code;  // contain the team code 
-            let slotNumber = game.availableSlots[game.slotLength - 1].pop();
+            let teamCode = game.slotStatus[slotPosition].code;  // contain the team code 
+            let slotNumber = game.availableSlots[slotPosition].pop();
 
             // now, make changes in the game and update the game
             game.slotStatus[game.slotLength - 1].isFull = true;
@@ -770,7 +785,7 @@ const registerInDuoGame = async (req, res) => {
             let randomSlot;
 
             // find all the slots where the status is false to give the player a suitable slot
-            for (let slot = game.slotStatus.length-1; slot >= 0; slot--) {
+            for (let slot=game.slotStatus.length-1; slot >= 0; slot--) {
 
                 // finding whose status is false only
                 if (!game.slotStatus[slot].isFull) {
@@ -862,7 +877,7 @@ const registerInDuoGame = async (req, res) => {
             }
         }
 
-        // if player is doing something wrong
+        // if player sent nothing or did something nrecogonizable things
         else return res.status(400).json({ status: 400, message: "There is an issue while registering in the game, Nothing sent!!", info: "Probably the player doing something wrong while registering!!" });
 
     } catch (err) {  // unrecogonized errors
