@@ -1,6 +1,6 @@
 // importing all requirements
 const router = require('express').Router();
-const { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame } = require('../controllers/game');
+const { createGame, getGames, deleteGame, updateGame, registerInSoloGame, registerInSquadGame, registerInDuoGame } = require('../controllers/game');
 const { fetchUser, fetchAnyUser } = require('../middleware/auth/authMiddleware');
 
 // to validate input fields
@@ -29,6 +29,10 @@ router.patch('/register-solo', validateMongoId(['game-id']), validateValidationR
 
 // Route 6: To register in the squad game: '/bzml/api/v1/games/register-squad?game-id=<mogno id>' [using PATCH] (login required)
 router.patch('/register-squad', validateSquadRegistration, validateValidationResult, fetchUser, registerInSquadGame);
+
+// Route 7: To register in the duo game: '/bzml/api/v1/games/register-duo?game-id=<mogno id>' [using PATCH] (login required)
+router.patch('/register-duo', validateSquadRegistration, validateValidationResult, fetchUser, registerInDuoGame);
+
 
 // export the router
 module.exports = router;
