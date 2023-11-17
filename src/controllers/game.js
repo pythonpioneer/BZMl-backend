@@ -127,7 +127,7 @@ const getGames = async (req, res) => {
         if (gameType === 'current') {
 
             // value that shouldn't be fetched (default if user is logged in as user)
-            notFetched = ['-host', '-roomId', '-roomPass', '-availableSlots', '-players', '-slots'];  // add all slots fields
+            notFetched = ['-host', '-roomId', '-roomPass', '-availableSlots', '-players', '-slots', '-slotStatus'];  // add all slots fields
 
             // now, check that the user is logged in or not
             if (req?.user?.id) {  // user is logged in
